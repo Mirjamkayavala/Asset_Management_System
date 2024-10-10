@@ -78,12 +78,12 @@
                         </a>
                     </li>
                     @endcan
-                    <li>
+                    <!-- <li>
                         <a href="{{ route('audit-trails.index') }}" class="nav_link sublink {{ Request::routeIs('audit-trails.index') ? 'active' : '' }}">
                             <span class="navlink_icon"><i class="bx bx-world"></i></span> 
                             View Audit Trails
                         </a>
-                    </li>
+                    </li> -->
               
                     @can('access', App\Models\Location::class)
                     <li>

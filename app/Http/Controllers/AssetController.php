@@ -374,22 +374,7 @@ class AssetController extends Controller
             $asset->user_id = $request->user_id; // Assign to user
         }
         
-        // // Handle the reassigning between user and vendor
-        // if ($request->has('vendor_id')) {
-        //     // If reassigned to a vendor, nullify the user and set the vendor
-        //     $validated['user_id'] = null;
-        //     $validated['previous_user_id'] = $asset->user_id;
-        //     $validated['vendor_id'] = $request->vendor_id;
-        // } elseif ($request->has('user_id')) {
-        //     // If reassigned to a user, nullify the vendor and set the user
-        //     $validated['vendor_id'] = null;
-        //     $validated['user_id'] = $request->user_id;
-        // } else {
-        //     // Handle case where neither user nor vendor are assigned
-        //     $validated['user_id'] = null;
-        //     $validated['vendor_id'] = null;
-        // }
-    
+       
         // Update the asset with the validated data
         $asset->update($validated);
 
@@ -466,25 +451,36 @@ class AssetController extends Controller
 
     
 
+    // public function restore($id)
+    // {
+    //     // Find the asset in the trashed records
+    //     $asset = Asset::withTrashed()->findOrFail($id);
+
+        
+    //     $asset->restore();
+
+        
+    //     $asset->asset_history()->restore();
+
+    //     // Notify users about the restoration
+    //     $users = User::all();
+    //     Notification::send($users, new AssetRestored($asset));
+
+    //     // Redirect or return response
+    //     return redirect()->route('assets.index')->with('success', 'Asset restored successfully.');
+    // }
+
     public function restore($id)
     {
-        // Find the asset in the trashed records
         $asset = Asset::withTrashed()->findOrFail($id);
 
-        
-        $asset->restore();
+        if ($asset->trashed()) {
+            $asset->restore();
+            return redirect()->route('assets.index')->with('success', 'Asset restored successfully.');
+        }
 
-        
-        $asset->asset_history()->restore();
-
-        // Notify users about the restoration
-        $users = User::all();
-        Notification::send($users, new AssetRestored($asset));
-
-        // Redirect or return response
-        return redirect()->route('assets.index')->with('success', 'Asset restored successfully.');
+        return redirect()->route('assets.index')->with('error', 'Asset cannot be restored.');
     }
-
     
 
 

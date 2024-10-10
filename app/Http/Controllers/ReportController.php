@@ -16,108 +16,123 @@ use App\Models\Location;
 use App\Models\Department;
 use App\Models\Vendor;
 use App\Models\User;
+use Carbon\Carbon;
 use App\Models\Invoice;
 
 class ReportController extends Controller
 {
     public function index(Request $request)
-{
-    // Start a query builder for assets
-    $assets = Asset::query();
+    {
+        // Start a query builder for assets
+        $assets = Asset::query();
 
-    // Apply filters based on the request parameters
-    if ($request->filled('status')) {
-        $assets->where('status', $request->status);
+        // Apply filters based on the request parameters
+        if ($request->filled('status')) {
+            $assets->where('status', $request->status);
+        }
+
+        if ($request->filled('asset_number')) {
+            $assets->where('asset_number', $request->asset_number);
+        }
+
+        if ($request->filled('category')) {
+            $assets->where('category', $request->category);
+        }
+
+        if ($request->filled('location')) {
+            $assets->where('location', $request->location);
+        }
+
+        if ($request->filled('model')) {
+            $assets->where('model', $request->model);
+        }
+
+        if ($request->filled('make')) {
+            $assets->where('make', $request->make);
+        }
+
+        if ($request->filled('vendor')) {
+            $assets->where('vendor', $request->vendor);
+        }
+
+        if ($request->filled('user_id')) {
+            $assets->where('user_id', $request->user_id);
+        }
+
+        // Add the date range filtering
+        if ($request->filled('start_date') && $request->filled('end_date')) {
+            // Ensure the end date includes the full day by adding 23:59:59
+            $startDate = $request->start_date;
+            $endDate = Carbon::parse($request->end_date)->endOfDay(); // Include the full end day
+
+            $assets->whereBetween('created_at', [$startDate, $endDate]);
+        }
+
+        // Fetch the filtered assets
+        $assets = $assets->get();
+
+        // Retrieve other necessary data
+        $makes = Asset::select('make')->distinct()->get();
+        $models = Asset::select('model')->distinct()->get();
+        $statuses = ['In use', 'New', 'Old', 'In Storage', 'Broken', 'Written Off'];
+        $locations = Location::all();
+
+        // Pass the filtered assets and other data to the view
+        return view('reports.index', compact('assets', 'makes', 'models', 'locations', 'statuses'));
     }
-
-    if ($request->filled('asset_number')) {
-        $assets->where('asset_number', $request->asset_number);
-    }
-
-    if ($request->filled('category')) {
-        $assets->where('category', $request->category);
-    }
-    if ($request->filled('location')) {
-        $assets->where('location', $request->location);
-    }
-
-    if ($request->filled('model')) {
-        $assets->where('model', $request->model);
-    }
-
-    if ($request->filled('make')) {
-        $assets->where('make', $request->make);
-    }
-
-    if ($request->filled('vendor')) {
-        $assets->where('vendor', $request->vendor);
-    }
-
-    if ($request->filled('user_id')) {
-        $assets->where('user_id', $request->user_id);
-    }
-
-    // Fetch the filtered assets
-    $assets = $assets->get(); // Use the same query builder to fetch results
-
-    // Retrieve other necessary data
-    $makes = Asset::select('make')->distinct()->get();
-    $models = Asset::select('model')->distinct()->get();
-    // $locations = Asset::select('location')->distinct()->get();
-    $statuses = ['In use', 'New', 'Old', 'In Storage', 'Broken', 'Written Off'];
-    $locations = Location::all();
-
-    // Pass the filtered assets and other data to the view
-    return view('reports.index', compact('assets', 'makes', 'models', 'locations', 'statuses'));
-}
 
 
 
     private function getFilteredAssets(Request $request)
     {
-        // Initialize the query for filtering assets
-        $assets = Asset::query();
-    
-        // Debug the SQL query to see if it's being generated correctly
-        // dd($query->toSql(), $query->getBindings()); 
+            // Initialize the query for filtering assets
+            $assets = Asset::query();
         
-    
-        // Apply filters based on the request parameters
-        if ($request->filled('status')) {
-            $assets->where('status', $request->status);
-        }
-    
-        if ($request->filled('asset_number')) {
-            $assets->where('asset_number', $request->asset_number);
-        }
-    
-        if ($request->filled('category')) {
-            $assets->where('category', $request->category);
-        }
-        if ($request->filled('location')) {
-            $assets->where('location', $request->location);
-        }
-    
-        if ($request->filled('model')) {
-            $assets->where('model', $request->model);
-        }
-    
-        if ($request->filled('make')) {
-            $assets->where('make', $request->make);
-        }
-    
-        if ($request->filled('vendor')) {
-            $assets->where('vendor', $request->vendor);
-        }
-    
-        if ($request->filled('user_id')) {
-            $assets->where('user_id', $request->user_id);
-        }
-    
-        // Get the filtered assets
-        return $assets->get();
+            // Debug the SQL query to see if it's being generated correctly
+            // dd($query->toSql(), $query->getBindings()); 
+            
+        
+            // Apply filters based on the request parameters
+            if ($request->filled('status')) {
+                $assets->where('status', $request->status);
+            }
+        
+            if ($request->filled('asset_number')) {
+                $assets->where('asset_number', $request->asset_number);
+            }
+        
+            if ($request->filled('category')) {
+                $assets->where('category', $request->category);
+            }
+            if ($request->filled('location')) {
+                $assets->where('location', $request->location);
+            }
+        
+            if ($request->filled('model')) {
+                $assets->where('model', $request->model);
+            }
+        
+            if ($request->filled('make')) {
+                $assets->where('make', $request->make);
+            }
+        
+            if ($request->filled('vendor')) {
+                $assets->where('vendor', $request->vendor);
+            }
+        
+            if ($request->filled('user_id')) {
+                $assets->where('user_id', $request->user_id);
+            }
+
+            // Add the date range filtering
+            if ($request->filled('start_date') && $request->filled('end_date')) {
+                $assets->whereBetween('created_at', [$request->start_date, $request->end_date]);
+            }
+        
+            // Get the filtered assets
+            return $assets->get();
     }
-    
+        
 
 
     public function preview(Request $request)

@@ -131,7 +131,7 @@
                         <td>{{ $asset->asset_number }}</td>
                         <td>{{ $asset->category }}</td>
                         <td>{{ $asset->user->name ?? 'N/A' }}</td>
-                        <td>{{ $asset->created_at->format('Y-m-d') }}</td>
+                        <td>{{ $asset->date }}</td>
                         <td>{{ optional($asset->previousUser)->name ?? 'N/A' }}</td>
                         <td>{{ $asset->vendor }}</td>
                         <td>{{ $asset->status }}</td>

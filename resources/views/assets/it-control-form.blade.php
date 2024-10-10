@@ -1,9 +1,9 @@
 <x-app-layout>
     <style>
         /* Ensure the form covers the entire page */
-        .container-fluid {
+        /* .container-fluid {
             width: 100%;
-        }
+        } */
 
         /* Make the image cover the top of the form */
         .form-logo {
@@ -18,12 +18,12 @@
                 display: none;
             }
 
-            /* Move content to the left and adjust the width */
+            /* Move content to the left and adjust the width
             .container-fluid {
                 margin: 0;
                 padding: 0;
                 width: 100%;
-            }
+            } */
 
             /* Make form content aligned to the left */
             .container-fluid .form-group, 
@@ -118,7 +118,7 @@
         </div>
 
         <!-- ICT Indemnity Form Section -->
-        <h6 style="margin-top: 180px;">ICT Indemnity Form</h6>
+        <h4 style="margin-top: 180px;">ICT Indemnity Form</h4>
         <p>1. I hereby declare that the ICT equipment issued is in good condition and that I will take full responsibility for any loss, damage, or misuse of this equipment.</p>
         <p>2. CENORED's equipments i.e. Laptops and Desktops are for official use only.</p>
         <p>3. The equipment can only be used by CENORED's employees according to CENORED's integrated ICT policy.</p>
@@ -169,7 +169,7 @@
     <br><br><br><br><br>
     <script>
         document.getElementById('printButton').addEventListener('click', function () {
-            // Hide elements with the class 'print-hide'
+            // // Hide elements with the class 'print-hide'
             document.querySelectorAll('.print-hide, .sidebar, nav').forEach(function (element) {
                 element.style.display = 'none';
             });

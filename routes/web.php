@@ -53,11 +53,19 @@ Route::get('/assets/total_count', [AssetController::class, 'getTotalAssetCount']
 Route::get('/search/assets', [AssetController::class, 'search'])->name('assets.search');
 Route::post('/transfer-temp-assets', [AssetController::class, 'transferTempAssetsToAssets']);
 
+
+Route::put('/assets/{id}/restore', [AssetController::class, 'restore'])->name('assets.restore');
+
+
 // Invoices
 Route::get('/invoices/{id}/file', [InvoiceController::class, 'viewFile'])->name('invoices.viewFile');
 
 // Insurance Reports
-Route::get('/insurances/report', [InsuranceReportController::class, 'report'])->name('insurance.report');
+Route::get('/insurances/report', [InsuranceReportController::class, 'index'])->name('insurance.report');
+
+Route::get('/insurances/filter', [InsuranceReportController::class, 'filter'])->name('insurances.filter');
+
+// Route::get('/insurances/report', [InsuranceReportController::class, 'report']);
 
 Route::get('/insurances/export/pdf', [InsuranceReportController::class, 'exportPdf'])->name('insurances.export.pdf');
 Route::get('/insurances/export/excel', [InsuranceReportController::class, 'exportExcel'])->name('insurances.export.excel');

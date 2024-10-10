@@ -1,3 +1,4 @@
+index.blade.php
 <x-app-layout>
     <section>
         <h6>Assets</h6>
@@ -78,6 +79,7 @@
                                     <td>{{ $asset->date }}</td>
                                     <td>{{ $asset->status }}</td>
                                     <td>
+
                                         @can('view', [App\Models\Asset::class, $asset])
                                         <a href="{{ route('assets.show', $asset->id) }}" class="btn btn-info btn-sm">
                                             <i class="fas fa-eye"></i>
@@ -95,6 +97,13 @@
                                             <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this asset?');">
                                                 <i class="fas fa-trash-alt"></i>
                                             </button>
+                                        </form>
+                                        @endcan
+                                        @can('restore', [App\Models\Asset::class, $asset])
+                                        <form action="{{ route('assets.restore', $asset->id) }}" method="POST" style="display:inline-block;">
+                                            @csrf
+                                            @method('PUT')
+                                            <button type="submit" class="btn btn-success">Restore</button>
                                         </form>
                                         @endcan
                                     </td>

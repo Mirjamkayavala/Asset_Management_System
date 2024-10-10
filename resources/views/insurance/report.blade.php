@@ -13,7 +13,7 @@
                 width: 100%;
             }
 
-            /* Ensure the report table covers the whole page and aligns to the left */
+            /* Ensure the report table covers the full width, aligned to the left */
             .card {
                 margin-left: 0;
                 width: 100%;
@@ -28,11 +28,22 @@
                 font-size: 12px;
             }
         }
+
+        /* Ensure the card aligns to the left and doesn't account for the sidebar space */
+        .container {
+            margin-left: 0 !important;
+            padding-left: 0 !important;
+        }
+
+        /* Align the report section to the left */
+        .card {
+            margin-left: 0;
+        }
     </style>
 
     <div class="container">
         <!-- Report Header -->
-        <img src="{{ asset('images/ceno-logo.png') }}" alt="Company Logo" width="1000" height="200">
+        <img src="{{ asset('images/ceno-logo.png') }}" alt="Company Logo" width="1200" height="200">
         <br><br>
 
         <!-- Filter Form (Hidden when printing) -->
@@ -86,8 +97,6 @@
             </table>
         </div>
     </div>
-
-    
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
