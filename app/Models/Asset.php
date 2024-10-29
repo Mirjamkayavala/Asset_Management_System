@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -7,81 +6,85 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 
-
-
 class Asset extends Model
 {
-    use HasFactory;
-    use SoftDeletes;
+    use HasFactory, SoftDeletes;
 
     protected $dates = ['date'];
 
     protected $fillable = [
-        'make', 'model', 'serial_number', 'user_id', 'asset_number','category' ,'date','vendor' ,'location', 'previous_user_id', 'category_id','location_id', 'vendor_id', 'status'
+        'make', 
+        'model', 
+        'serial_number', 
+        'user_id', 
+        'asset_number',
+        'category',
+        'date',
+        'vendor',
+        'location',
+        'previous_user_id', 
+        'category_id',
+        'location_id',
+        'vendor_id',
+        'status'
     ];
 
     // Define relationships
-    public function assetCategories()
+    public function assetCategory()
     {
-        return $this->belongsTo(AssetCategory::class,'category_id','id');
+        return $this->belongsTo(AssetCategory::class, 'category_id', 'id');
     }
 
-    public function locations()
+    public function location()
     {
         return $this->belongsTo(Location::class, 'location_id', 'id');
     }
 
-    public function vendors()
+    public function vendor()
     {
         return $this->belongsTo(Vendor::class, 'vendor_id', 'id');
     }
 
-   // Define the relationship with the User model (current user)
-    public function users()
+    // Relationship with the current user
+    public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    // Define the relationship with the User model (previous user)
+    // Relationship with the previous user
     public function previousUser()
     {
         return $this->belongsTo(User::class, 'previous_user_id');
     }
 
-    public function asset_history()
+    public function assetHistory()
     {
         return $this->hasMany(AssetHistory::class, 'asset_id');
     }
 
-    public function departments()
+    public function department()
     {
         return $this->belongsTo(Department::class, 'department_id', 'id');
     }
 
-    public function insurances()
+    // Relationship with insurances by asset's serial number
+    public function insurancesBySerialNumber()
     {
-        return $this->belongsTo(Insurance::class, 'insurance_id', 'id');
+        return $this->hasMany(Insurance::class, 'serial_number', 'serial_number');
     }
 
-    // public function claim()
-    // {
-    //     return $this->belongsTo(Insurance::class, 'claim_number');
-    // }
-
-    // public function insuranceStatus()
-    // {
-    //     return $this->belongsTo(Insurance::class, 'insurance_status');
-    // }
-
-    public function invoices()
+    // Relationship with invoices
+    public function invoice()
     {
         return $this->belongsTo(Invoice::class, 'invoice_id');
     }
-   
+
+    // Boot method to handle audit logging
     public static function boot()
     {
         parent::boot();
 
+        // Log updates
         static::updating(function ($model) {
             foreach ($model->getDirty() as $columnName => $newValue) {
                 $oldValue = $model->getOriginal($columnName);
@@ -97,28 +100,16 @@ class Asset extends Model
             }
         });
 
-        // static::creating(function ($model) {
-        //     \App\Models\AuditTrail::create([
-        //         'user_id' => auth()->id(),
-        //         'table_name' => $model->getTable(),
-        //         'column_name' => null, // No specific column for create
-        //         'old_value' => null,
-        //         'new_value' => json_encode($model->getAttributes()), // Log entire row
-        //         'action' => 'create',
-        //     ]);
-        // });
-
+        // Log deletions
         static::deleting(function ($model) {
             \App\Models\AuditTrail::create([
                 'user_id' => auth()->id(),
                 'table_name' => $model->getTable(),
-                'column_name' => null, // No specific column for delete
-                'old_value' => json_encode($model->getAttributes()), // Log entire row
+                'column_name' => null,
+                'old_value' => json_encode($model->getAttributes()),
                 'new_value' => null,
                 'action' => 'delete',
             ]);
         });
     }
-
-    
 }

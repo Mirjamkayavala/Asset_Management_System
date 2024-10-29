@@ -33,6 +33,7 @@ class StoreInsuranceRequest extends FormRequest
             'rejection_date' => 'nullable|date|before_or_equal:today',
             'description' => 'required|string|max:255',
             'insurance_document' => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048',
+            'serial_number' => 'required|exists:assets,serial_number',
         ];
     }
 }

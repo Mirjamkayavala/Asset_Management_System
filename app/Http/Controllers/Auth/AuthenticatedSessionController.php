@@ -51,23 +51,43 @@ class AuthenticatedSessionController extends Controller
 
             $user = User::where('email', $email)->first();
 
+            // Extract the role information from LDAP
+            $ldapRole = $ldapUser->memberOf[0] ?? null; // This depends on how roles are assigned in LDAP
+
             if (!$user) {
-                // If the user does not exist, create a new one
+                // If the user does not exist, create a new one with default role
                 User::create([
                     'name' => $ldapUser->cn[0] ?? 'Unknown Name',
                     'email' => $email,
                     'username' => $ldapUser->samaccountname[0] ?? 'unknown-username',
-                    'password' => bcrypt('default-password'), 
-                    'role_id' => 5, 
+                    'password' => bcrypt('default-password'),
+                    'role_id' => $this->mapLdapRoleToLocal($ldapRole), // Map the LDAP role to local role
                 ]);
             } else {
                 // Optionally, update the existing user with new LDAP data
                 $user->update([
                     'name' => $ldapUser->cn[0] ?? $user->name,
                     'username' => $ldapUser->samaccountname[0] ?? $user->username,
+                    'role_id' => $this->mapLdapRoleToLocal($ldapRole), // Update the role if it has changed
                 ]);
             }
         }
+    }
+
+    /**
+     * Map LDAP roles to local roles.
+     */
+    private function mapLdapRoleToLocal($ldapRole)
+    {
+        // Define a mapping array to associate LDAP roles with local role IDs
+        $roleMap = [
+            'admin' => 1,
+            'technician' => 2,
+            'costing_department' => 4,
+        ];
+
+        // Return the mapped role ID, or default to 5 (viewer or normal_user)
+        return $roleMap[$ldapRole] ?? 5;
     }
 
     /**
@@ -77,9 +97,7 @@ class AuthenticatedSessionController extends Controller
     {
         // Attempt to authenticate with LDAP
         try {
-            // Try authenticating with LDAP if available
-            $request->authenticate(); // This will attempt LDAP authentication
-            
+            $request->authenticate(); 
             // Sync LDAP users to local database
             $this->syncLdapUsers();
 
@@ -91,12 +109,10 @@ class AuthenticatedSessionController extends Controller
             // LDAP authentication failed, now attempt local authentication
             $credentials = $request->only('username', 'password');
             
-            // Check if local authentication is successful
             if (Auth::attempt($credentials)) {
                 $user = Auth::user();
                 $this->assignRoleToUser($request, $user); // Assign role based on local authentication
             } else {
-                // Authentication failed completely, redirect back with error
                 return redirect()->back()->withErrors(['login' => 'Login failed. Please check your credentials.']);
             }
         }
@@ -107,6 +123,9 @@ class AuthenticatedSessionController extends Controller
         return redirect()->intended(route('dashboard', absolute: false));
     }
 
+    /**
+     * Assign a role to the user based on LDAP or local data.
+     */
     private function assignRoleToUser($request, $user)
     {
         // Hardcoded default credentials
@@ -115,16 +134,12 @@ class AuthenticatedSessionController extends Controller
 
         // Check if the user is using the hardcoded credentials
         if ($request->username === $defaultUsername && $request->password === $defaultPassword) {
-            // Assign role_id = 1 for the default admin user
-            $user->role_id = 1;
-        } else {
-            // Assign role_id = 5 for all other users
-            $user->assignRole(5);
+            $user->role_id = 1; // Admin role for hardcoded credentials
         }
 
+        // No need to manually assign other roles if syncLdapUsers has already updated the role
         $user->save();
     }
-
 
     /**
      * Destroy an authenticated session.

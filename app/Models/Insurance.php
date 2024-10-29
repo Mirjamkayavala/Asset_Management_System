@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -23,13 +22,28 @@ class Insurance extends Model
         'claim_date',
         'description',
         'insurance_document',
+        'serial_number',
     ];
 
+    // Relationship to Asset by asset_id
+    public function assetById()
+    {
+        return $this->belongsTo(Asset::class, 'asset_id');
+    }
+
+    // Relationship to Asset by serial_number
+    public function assetBySerial()
+    {
+        return $this->belongsTo(Asset::class, 'serial_number', 'serial_number');
+    }
+
+    // Relationship to Asset using the default asset_id
     public function asset()
     {
         return $this->belongsTo(Asset::class, 'asset_id');
     }
 
+    // Relationship to User
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');

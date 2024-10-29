@@ -249,26 +249,7 @@
                 </div>
             </div>
 
-            <!-- Insurance Field (Initially Hidden) -->
-            <div class="card mb-3" id="insurance_field" style="display: none;">
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="insurance_id">Insurance Details</label>
-                            <option value="">Select Insurance</option>
-                                @foreach($insurances as $insurance)
-                                    <option value="{{ $insurance->id }}" {{ $insurance->id == $asset->insurance_id ? 'selected' : '' }}>
-                                        {{ $insurance->policy_number }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            @error('insurance')
-                                <div class="text-danger">{{ $message }}</div>
-                            @enderror
-                        </div>
-                    </div>
-                </div>
-            </div>
+            
 
             <!-- Form Footer -->
             <div class="form-footer">

@@ -71,14 +71,14 @@ return [
                 'model' => App\Models\User::class,
                 'sync_passwords' => true,
                 'sync_attributes' =>[
-                    'name'=> 'name',
+                    // 'name'=> 'name',
                      'username' =>'samaccountname',
-                    'email' => 'email',
+                    // 'email' => 'email',
                 ],
                 'sync_existing' => [
-                    'name'=> 'name',
+                    // 'name'=> 'name',
                     'username' =>'samaccountname',
-                   'email' => 'email',
+                //    'email' => 'email',
                 ],
             ]
         ],

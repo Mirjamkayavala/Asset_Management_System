@@ -11,10 +11,13 @@ use LdapRecord\Laravel\LdapImportable;
 use LdapRecord\Laravel\Auth\HasLdapUser;
 use LdapRecord\Laravel\Auth\LdapAuthenticatable;
 use LdapRecord\Laravel\Auth\AuthenticatesWithLdap;
+// use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable implements LdapAuthenticatable, LdapImportable
 {
     use HasFactory, Notifiable,  AuthenticatesWithLdap, HasLdapUser; // Correct trait here
+    // use HasRoles; 
+    
 
     protected $fillable = [
         'username',
@@ -50,14 +53,19 @@ class User extends Authenticatable implements LdapAuthenticatable, LdapImportabl
         return $this->hasMany(AssetHistory::class);
     }
 
-    public function roles()
-    {
-        return $this->belongsToMany(Role::class);
-    }
+    // public function roles()
+    // {
+    //     return $this->belongsToMany(Role::class);
+    // }
 
     public function role(): BelongsTo
     {
         return $this->belongsTo(Role::class, 'role_id');
+    }
+
+    public function roles()
+    {
+        return $this->belongsToMany(Role::class, 'role_user');
     }
 
     public function hasRole($role)

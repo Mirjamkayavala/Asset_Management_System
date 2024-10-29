@@ -26,8 +26,8 @@ return new class extends Migration
             $table->unsignedBigInteger('category_id')->nullable(); 
             $table->unsignedBigInteger('location_id')->nullable(); 
             $table->unsignedBigInteger('vendor_id')->nullable(); 
-            $table->unsignedBigInteger('insurance_id')->nullable(); 
-            $table->string('status');
+            // $table->unsignedBigInteger('insurance_id')->nullable(); 
+            $table->string('status')->nullable();
             $table->softDeletes();
             $table->timestamps();
 
@@ -37,7 +37,7 @@ return new class extends Migration
             $table->foreign('category_id')->references('id')->on('asset_categories');
             $table->foreign('location_id')->references('id')->on('locations');
             $table->foreign('vendor_id')->references('id')->on('vendors');
-            $table->foreign('insurance_id')->references('id')->on('insurances');
+            // $table->foreign('insurance_id')->references('id')->on('insurances');
         });
     }
 

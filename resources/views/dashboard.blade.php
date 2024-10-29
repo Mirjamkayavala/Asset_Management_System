@@ -2,15 +2,24 @@
 <div class="main">
 
     <div class="content">
+        <style>
+            .total-assets { background-color: #4CAF50; }
+            .in-storage { background-color: #2196F3; }
+            .broken { background-color: #FF5722; }
+            .written-off { background-color: #9C27B0; }
+            .new-asset { background-color: #FFEB3B; }
+            .old-asset { background-color: #795548; }
+        </style>
+
         <div class="metrics">
-            <a href="javascript:void(0)" class="card" onclick="showTotalAssetsTable()">
+            <a href="javascript:void(0)" class="card" onclick="showTotalAssetsTable()" background-color: #795548;>
                 <p id="totalAssetsCount">{{ $totalAssets }}</p>
                 <h8>Total Assets</h8>
             </a>
-            <a href="javascript:void(0)" class="card" onclick="showAssetsInUseTable()">
+            <!-- <a href="javascript:void(0)" class="card" onclick="showAssetsInUseTable()">
                 <p id="inUseCount">{{ $In_UseCount }}</p>
                 <h8>Total assets in use</h8>
-            </a>
+            </a> -->
             <a href="javascript:void(0)" class="card" onclick="showAssetsInStorageTable()">
                 <p id="inStorageCount">{{ $In_StorageCount }}</p>
                 <h8>Total assets available in storage</h8>
@@ -115,7 +124,7 @@
     </thead>
     <tbody>
         @foreach($assets as $asset)
-            @if($asset->status === 'In Storage')
+            @if($asset->status === 'In_Storage')
                 <tr>
                     <td>{{ $asset->make }}</td>
                     <td>{{ $asset->model }}</td>
@@ -174,6 +183,30 @@
     </tbody>
 </table>
 
+<table id="assetsWrittenOffTable" class="table table-striped table-bordered" style="display: none;">
+    <thead>
+        <tr>
+            <th>Make</th>
+            <th>Model</th>
+            <th>Serial Number</th>
+            <th>Asset Number</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach($assets->where('status', 'WrittenOff') as $asset)
+            <tr>
+                <td>{{ $asset->make }}</td>
+                <td>{{ $asset->model }}</td>
+                <td>{{ $asset->serial_number }}</td>
+                <td>{{ $asset->asset_number }}</td>
+                <td>{{ $asset->status }}</td>
+            </tr>
+        @endforeach
+    </tbody>
+</table>
+
+
 <br><br><br><br><br>
 
 <script>
@@ -191,6 +224,7 @@
         document.getElementById('assetsInStorageTable').style.display = 'none';
         document.getElementById('newAssetsTable').style.display = 'none';
         document.getElementById('oldAssetsTable').style.display = 'none';
+        document.getElementById('assetsWrittenOffTable').style.display = 'none';
     }
 
     function showAssetsInStorageTable() {
@@ -199,6 +233,7 @@
         document.getElementById('assetsInStorageTable').style.display = 'table';
         document.getElementById('newAssetsTable').style.display = 'none';
         document.getElementById('oldAssetsTable').style.display = 'none';
+        document.getElementById('assetsWrittenOffTable').style.display = 'none';
     }
 
     function showAssetsBrokenTable() {
@@ -208,16 +243,18 @@
         document.getElementById('assetsInStorageTable').style.display = 'none';
         document.getElementById('newAssetsTable').style.display = 'none';
         document.getElementById('oldAssetsTable').style.display = 'none';
+        document.getElementById('assetsWrittenOffTable').style.display = 'none';
     }
 
     function showAssetsWrittenOffTable() {
-        filterAssetsInUseTable(['Written Off']);
         document.getElementById('totalAssetsTable').style.display = 'none';
-        document.getElementById('assetsInUseTable').style.display = 'table';
+        document.getElementById('assetsInUseTable').style.display = 'none';
         document.getElementById('assetsInStorageTable').style.display = 'none';
         document.getElementById('newAssetsTable').style.display = 'none';
         document.getElementById('oldAssetsTable').style.display = 'none';
+        document.getElementById('assetsWrittenOffTable').style.display = 'table';
     }
+
 
     function showNewAssetsTable() {
         document.getElementById('totalAssetsTable').style.display = 'none';
@@ -225,6 +262,7 @@
         document.getElementById('assetsInStorageTable').style.display = 'none';
         document.getElementById('newAssetsTable').style.display = 'table';
         document.getElementById('oldAssetsTable').style.display = 'none';
+        document.getElementById('assetsWrittenOffTable').style.display = 'none';
     }
 
     function showOldAssetsTable() {
@@ -233,6 +271,7 @@
         document.getElementById('assetsInStorageTable').style.display = 'none';
         document.getElementById('newAssetsTable').style.display = 'none';
         document.getElementById('oldAssetsTable').style.display = 'table';
+        document.getElementById('assetsWrittenOffTable').style.display = 'none';
     }
 
     function filterAssetsInUseTable(statuses) {

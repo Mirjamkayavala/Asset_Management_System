@@ -56,8 +56,8 @@
     let warningTimer;
     let logoutTimer;
     
-    const warningTime = 59 * 60 * 1000; // 9 minutes (show warning after 9 minutes)
-    const logoutTime = 60 * 60 * 1000; // 10 minutes (logout after 10 minutes)
+    const warningTime = 59 * 60 * 1000; 
+    const logoutTime = 60 * 60 * 1000; 
     
     function startTimers() {
         warningTimer = setTimeout(showWarning, warningTime);

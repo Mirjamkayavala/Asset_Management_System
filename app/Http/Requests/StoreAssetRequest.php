@@ -40,7 +40,7 @@ class StoreAssetRequest extends FormRequest
             'location_id' => 'nullable|exists:locations,id',
             'vendor_id' => 'nullable|exists:vendors,id',
             'insurance_id' => 'nullable|exists:insurances,id',
-            'status' => 'required|string|max:25',
+            'status' => 'nullable|string|max:25',
             
         ];
     }

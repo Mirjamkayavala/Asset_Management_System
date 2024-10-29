@@ -1,4 +1,3 @@
-index.blade.php
 <x-app-layout>
     <section>
         <h6>Assets</h6>
@@ -59,7 +58,7 @@ index.blade.php
                         <thead>
                             <tr>
                                 <th>No.</th>
-                                <th>Make</th>
+                                <th>Name</th>
                                 <th>Model</th>
                                 <th>Serial Number</th>
                                 <th>Asset Number</th>
@@ -99,13 +98,13 @@ index.blade.php
                                             </button>
                                         </form>
                                         @endcan
-                                        @can('restore', [App\Models\Asset::class, $asset])
+                                        <!-- @can('restore', [App\Models\Asset::class, $asset])
                                         <form action="{{ route('assets.restore', $asset->id) }}" method="POST" style="display:inline-block;">
                                             @csrf
                                             @method('PUT')
                                             <button type="submit" class="btn btn-success">Restore</button>
                                         </form>
-                                        @endcan
+                                        @endcan -->
                                     </td>
                                 </tr>
                             @endforeach

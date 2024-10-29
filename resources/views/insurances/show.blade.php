@@ -26,6 +26,10 @@
                         <th>Make</th>
                         <td>{{ $insurance->asset ? $insurance->asset->make : 'No asset assigned' }}</td>
                     </tr>
+                    <tr>
+                        <th>Serial Number</th>
+                        <td>{{ $insurance->asset ? $insurance->asset->serial_number : 'No asset assigned' }}</td>
+                    </tr>
                     <!-- Policy Number -->
                     <tr>
                         <th>Policy Number</th>

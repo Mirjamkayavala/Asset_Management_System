@@ -61,9 +61,8 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                    
                         <label for="category">Category</label>
-                        <input type="text" class="form-control" id="category" value="{{ $asset->assetCategories->category_name ?? 'N/A' }}" readonly>
+                        <input type="text" class="form-control" id="category" value="{{ $asset->assetCategory->category_name ?? 'N/A' }}" readonly>
                     </div>
                     <div class="col-md-6 mb-3">
                         <label for="location">Location</label>
@@ -136,6 +135,7 @@
             <a href="{{ route('assets.edit', $asset->id) }}" class="btn btn-primary">
                 <i class="fas fa-edit"></i>
             </a>
+            @can('delete', [App\Models\Asset::class, $asset])
             <form action="{{ route('assets.destroy', $asset->id) }}" method="POST" style="display:inline-block;">
                 @csrf
                 @method('DELETE')
@@ -143,6 +143,7 @@
                     <i class="fas fa-trash-alt"></i>
                 </button>
             </form>
+            @endcan
         </div>
     </div>
     <br><br><br><br>

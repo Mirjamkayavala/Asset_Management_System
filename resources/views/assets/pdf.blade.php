@@ -1,60 +1,51 @@
-<x-app-layout>
-    <!-- <style>
-        /* Ensure the form covers the entire page */
-        .container-fluid {
-            width: 100%;
-        } 
-
-        /* Make the image cover the top of the form */
-        .form-logo {
-            width: 100%;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IT Control Form</title>
+    <style>
+        body {
+            font-family: nexa;
+            font-size: 16px;
+        }
+        .form-control {
+            border: none;
+            border-bottom: 1px solid #000;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+        }
+        h4 {
+            text-align: center;
+        }
+        .logo {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .logo img {
+            width: 100%; /* Make the logo span the entire width */
             height: auto;
-            object-fit: cover;
         }
-
-        /* Hide Navbar, Sidebar, and Print Button when printing */
+        .print-hide {
+            display: block;
+        }
         @media print {
-            nav, .sidebar, .print-hide {
-                display: none;
-            }
-
-            /* Move content to the left and adjust the width */
-            .container-fluid {
-                margin: 0;
-                padding: 0;
-                width: 100%;
-            } 
-
-            /* Make form content aligned to the left */
-            .container-fluid .form-group, 
-            .container-fluid h4, 
-            .container-fluid p {
-                text-align: left;
-            }
-
-            /* Remove default margin and padding from body */
-            body {
-                margin: 0;
-                padding: 0;
-            }
-
-            /* Remove margins around the form */
-            .container-fluid {
-                margin-left: 0;
+            .print-hide {
+                display: none; /* Hide print/export buttons and separator when printing */
             }
         }
-    </style> -->
+    </style>
+</head>
+<body>
+    <!-- Logo Section -->
+    <div class="logo">
+        <img src="{{ asset('images/ceno.png') }}" alt="Company Logo"> <!-- Full-width logo -->
+    </div>
 
-    <div class="container-fluid mt-5">
-        <!-- Logo covering the entire top of the form -->
-        <div class="text-center mb-4">
-            <img src="{{ asset('images/ceno.png') }}" alt="Company Logo" class="form-logo">
-        </div>
-
-        <!-- Form Title -->
-        <h4 class="text-center mb-4">IT Control Form</h4>
-
-        <!-- Issued, Received, and Returned By -->
+    <!-- Form Content -->
+    <div class="container-fluid">
+        <h4>IT Control Form</h4>
+        
         <div class="form-group row">
             <div class="col-md-4">
                 <label for="issued_by">Issued By:</label>
@@ -70,7 +61,6 @@
             </div>
         </div>
 
-        <!-- Component Issued and Serial Number -->
         <!-- Component Issued and Serial Number -->
         <div class="form-group row">
             <div class="col-md-6">
@@ -95,7 +85,6 @@
             <p>I, ..................................... hereby acknowledge that I received the equipment in the following condition: {{ $asset->condition }}.</p>
         </div>
 
-        <!-- Signatures and Dates -->
         <div class="form-group row">
             <div class="col-md-4">
                 <label for="signature">Signature:</label>
@@ -116,14 +105,17 @@
             <label for="it_signature">Signature of IT Personnel:</label>
             <p class="form-control">{{ $asset->it_personnel_signature }}</p>
         </div>
-
+        <br><br><br><br><br><br>
+        <hr class="print-hide">
+        
+        <br><br><br><br><br><br><br><br><br>
         <!-- ICT Indemnity Form Section -->
-        <h4>ICT Indemnity Form</h4>
+        <h4>ICT Indemnity Form</h4><br>
         <p>1. I hereby declare that the ICT equipment issued is in good condition and that I will take full responsibility for any loss, damage, or misuse of this equipment.</p>
         <p>2. CENORED's equipments i.e. Laptops and Desktops are for official use only.</p>
         <p>3. The equipment can only be used by CENORED's employees according to CENORED's integrated ICT policy.</p>
         <p>4. Equipment i.e. Laptops, laptop adapters, laptop bags, etc, is the sole responsibility of the person who takes it beyond CENORED premises - theft and damage included.</p>
-        <p>5. In case of theft or damage to the equipment, employees will be held liable to pay 30% replacement fee within the period of four months.</p><br><br>
+        <p>5. In case of theft or damage to the equipment, employees will be held liable to pay 30% replacement fee within the period of four months.</p>
         <p>I    ............................................. hereby acknowledge that I will be held liable to replace any equipment (Laptop, Adapter, Bag, etc) lost through theft or damaged.</p>
 
         <!-- Declaration and Signed At -->
@@ -158,30 +150,43 @@
             </div>
         </div>
 
-        <!-- Print and Export Buttons -->
-        <div class="d-flex justify-content-between">
-            <a href="#" id="printButton" class="btn btn-primary print-hide">Print</a>
-            <a href="{{ route('assets.exportToPdf', $asset->id) }}" class="btn btn-secondary">Export to PDF</a>
+        <div class="row print-hide">
+            <!-- Download PDF Button -->
+            
+                <!-- <form action="{{ route('form.download', $asset->id) }}" method="GET">
+                    <button type="submit" class="btn btn-success w-100" style="background-color: #04AA6D; border: 2px;">Download PDF</button>
+                </form>
+                <br>
+             -->
 
+            <!-- Print Button -->
+            
+            <button id="printButton" class="btn btn-primary w-100" style="background-color: #008CBA; border: 2px solid #000;">Print</button>
+
+            
+
+            <!-- Back Button -->
+            
+                <a href="{{ route('assets.index') }}" class="btn btn-secondary w-100" style="background-color: #008CBA; border: 2px solid #000;">Back</a>
+            
         </div>
-
     </div>
 
-    <br><br><br><br><br>
     <script>
         document.getElementById('printButton').addEventListener('click', function () {
-            // // Hide elements with the class 'print-hide'
-            document.querySelectorAll('.print-hide, .sidebar, nav').forEach(function (element) {
+            // Hide elements with the 'print-hide' class
+            document.querySelectorAll('.print-hide').forEach(function (element) {
                 element.style.display = 'none';
             });
 
-            // Print the page
+            // Trigger the print
             window.print();
 
-            // Show the hidden elements again after printing
-            document.querySelectorAll('.print-hide, .sidebar, nav').forEach(function (element) {
+            // Restore hidden elements after printing
+            document.querySelectorAll('.print-hide').forEach(function (element) {
                 element.style.display = '';
             });
         });
     </script>
-</x-app-layout>
+</body>
+</html>

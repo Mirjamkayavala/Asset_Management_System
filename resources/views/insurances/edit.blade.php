@@ -29,28 +29,37 @@
                             @endforeach
                         </select>
                     </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="serial_number">Asset Serial Number</label>
+                        <select name="serial_number" id="serial_number" class="form-control" required>
+                            <option value="">Select Serial Number</option>
+                            @foreach($assets as $asset)
+                                <option value="{{ $asset->serial_number }}" {{ $insurance->serial_number == $asset->serial_number ? 'selected' : '' }}>
+                                    {{ $asset->serial_number }} - {{ $asset->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
 
+                    
+                </div>
+                    
+            </div>
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-body">
+                    
+                <div class="row">
                     <div class="col-md-6 mb-3">
                         <label for="claim_number">Policy Number</label>
                         <input type="text" name="claim_number" id="claim_number" class="form-control" value="{{ $insurance->claim_number }}">
                     </div>
-                </div>
-                    
-            </div>
-        </div>
-
-        <div class="card mb-3">
-            <div class="card-body">
-                    
-                <div class="row">
                     <div class="col-md-6 mb-3">
                         <label for="insurance_type">Insurance Type</label>
                         <input type="text" name="insurance_type" id="insurance_type" class="form-control" value="{{ $insurance->insurance_type }}">
                     </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="amount">Amount</label>
-                        <input type="number" name="amount" id="amount" class="form-control" value="{{ $insurance->amount }}">
-                    </div>
+                    
                 </div>
             </div>
         </div>
@@ -59,6 +68,10 @@
             <div class="card-body">
                     
                 <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="amount">Amount</label>
+                        <input type="number" name="amount" id="amount" class="form-control" value="{{ $insurance->amount }}">
+                    </div>
                     <div class="col-md-6 mb-3">
                         <label for="user_id">Claimed By</label>
                         <select name="user_id" id="user_id" class="form-control">
@@ -70,14 +83,7 @@
                         </select>
                     </div>
 
-                    <div class="col-md-6 mb-3">
-                        <label for="status">Status</label>
-                        <select name="status" id="status" class="form-control" required>
-                            <option value="Approved" {{ $insurance->status == 'Approved' ? 'selected' : '' }}>Approved</option>
-                            <option value="Claimed" {{ $insurance->status == 'Claimed' ? 'selected' : '' }}>Claimed</option>
-                            <option value="Rejected" {{ $insurance->status == 'Rejected' ? 'selected' : '' }}>Rejected</option>
-                        </select>
-                    </div>
+                    
                 </div>
             </div>
         </div>
@@ -86,14 +92,19 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-6 mb-3">
+                        <label for="status">Status</label>
+                        <select name="status" id="status" class="form-control" required>
+                            <option value="Approved" {{ $insurance->status == 'Approved' ? 'selected' : '' }}>Approved</option>
+                            <option value="Claimed" {{ $insurance->status == 'Claimed' ? 'selected' : '' }}>Claimed</option>
+                            <option value="Rejected" {{ $insurance->status == 'Rejected' ? 'selected' : '' }}>Rejected</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
                         <label for="claim_date">Claim Date</label>
                         <input type="date" name="claim_date" id="claim_date" class="form-control" value="{{ $insurance->claim_date }}">
                     </div>
 
-                    <div class="col-md-6 mb-3">
-                        <label for="approval_date">Approval Date</label>
-                        <input type="date" name="approval_date" id="approval_date" class="form-control" value="{{ $insurance->approval_date }}">
-                    </div>
+                    
                 </div>
             </div>
         </div>
@@ -102,14 +113,15 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-6 mb-3">
+                        <label for="approval_date">Approval Date</label>
+                        <input type="date" name="approval_date" id="approval_date" class="form-control" value="{{ $insurance->approval_date }}">
+                    </div>
+                    <div class="col-md-6 mb-3">
                         <label for="rejection_date">Rejection Date</label>
                         <input type="date" name="rejection_date" id="rejection_date" class="form-control" value="{{ $insurance->rejection_date }}">
                     </div>
 
-                    <div class="col-md-6 mb-3">
-                        <label for="description">Comments</label>
-                        <textarea name="description" id="description" class="form-control">{{ $insurance->description }}</textarea>
-                    </div>
+                    
                 </div>
             </div>
         </div>
@@ -117,6 +129,10 @@
         <div class="card mb-3">
             <div class="card-body">
                 <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="description">Comments</label>
+                        <textarea name="description" id="description" class="form-control">{{ $insurance->description }}</textarea>
+                    </div>
                     <div class="col-md-6 mb-3">
                         <label for="insurance_document">Insurance Documents</label>
                         @if($insurance->insurance_document)

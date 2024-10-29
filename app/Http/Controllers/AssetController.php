@@ -7,7 +7,7 @@ use App\Models\User;
 use App\Models\Asset;
 use App\Models\Vendor;
 use App\Models\Department;
-use App\Models\Insurance;
+// use App\Models\Insurance;
 use App\Models\Location;
 use App\Models\AuditTrail;
 use App\Models\ImportFile;
@@ -54,13 +54,13 @@ class AssetController extends Controller
         }
 
         
-        $paginatedAssets = Asset::with('users', 'invoices')
+        $paginatedAssets = Asset::with('user')
             ->orderBy('created_at', 'DESC')
             ->paginate(50);
 
         // Group the assets by user
         $groupedAssets = $paginatedAssets->getCollection()->groupBy(function($assets) {
-            return $assets->users->name ?? 'Unassigned';
+            return $assets->user->name ?? 'Unassigned';
         });
 
         $data = DB::table('assets')->orderBy('asset_number', 'DESC')
@@ -75,7 +75,7 @@ class AssetController extends Controller
         $assetCategories = AssetCategory::all();
         $locations = Location::all();
        
-        $insurances = Insurance::all();
+        // $insurances = Insurance::all();
 
         $In_UseCount = Asset::where('status', 'In Use')->count();
         $In_StorageCount = Asset::where('status', 'In Storage')->count();
@@ -84,35 +84,43 @@ class AssetController extends Controller
         $NewCount = Asset::where('status', 'New')->count();
         $OldCount = Asset::where('status', 'Old')->count();
 
-        return view('assets.index', compact('paginatedAssets', 'groupedAssets', 'users', 'In_UseCount', 'In_StorageCount', 'BrokenCount', 'WrittenOffCount', 'vendors', 'assetCategories', 'departments', 'insurances', 'NewCount', 'OldCount', 'data', 'locations'));
+        return view('assets.index', compact('paginatedAssets', 'groupedAssets', 'users', 'In_UseCount', 'In_StorageCount', 'BrokenCount', 'WrittenOffCount', 'vendors', 'assetCategories', 'departments', 'NewCount', 'OldCount', 'data', 'locations'));
     }
 
     public function import(Request $request)
-    {
+{
+    try {
         // Validate the file input
         $request->validate([
             'file' => 'required|mimes:xlsx,xls,csv|max:2048',
         ]);
 
-       
-        Excel::import(new AssetTempImport,"Asset_records_spreadsheet.xlsx");
+        // Store the uploaded file temporarily
+        $file = $request->file('file')->store('temp'); // Stores in storage/app/temp folder
+        $filePath = storage_path('app/' . $file);
 
+        // Use the stored file path in the import function
+        Excel::import(new AssetTempImport, $filePath);
+
+        // Fetch the imported data from the temp table
         $tempAssets = DB::table('load_temp_assets')->get();
 
         foreach ($tempAssets as $tempAsset) {
             // Check if the serial number already exists in the assets table
-            $exists = Asset::where('serial_number', $tempAsset->serial_number)->exists();
-        
+            $exists = Asset::where('serial_number', $tempAsset->serial_number)
+                            ->orWhere('asset_number', $tempAsset->asset_number)
+                            ->exists();
+            
             if (!$exists) {
                 // Convert Excel serial date to MySQL date format
                 $convertedDate = \Carbon\Carbon::createFromFormat('Y-m-d', gmdate("Y-m-d", ($tempAsset->date - 25569) * 86400))->toDateString();
                 
-                // Fetch user_id for current_user 
+                // Fetch user_id for current_user
                 $currentUserId = DB::table('users')->where('name', $tempAsset->current_user)->value('id');
                 
-                // Fetch user_id for previous_user 
+                // Fetch user_id for previous_user
                 $previousUserId = DB::table('users')->where('name', $tempAsset->previous_user)->value('id');
-            
+                
                 // Insert data into the assets table
                 Asset::create([
                     'make'            => $tempAsset->make,
@@ -120,31 +128,36 @@ class AssetController extends Controller
                     'category'        => $tempAsset->category,
                     'serial_number'   => $tempAsset->serial_number,
                     'asset_number'    => $tempAsset->asset_number,
-                    'date'            => $convertedDate,  
+                    'date'            => $convertedDate,
                     'vendor'          => $tempAsset->vendor,
-                    'previous_user_id'=> $previousUserId, 
-                    'user_id'         => $currentUserId,  
+                    'previous_user_id'=> $previousUserId,
+                    'user_id'         => $currentUserId,
                     'status'          => $tempAsset->status,
                 ]);
+            } else {
+                // If asset already exists, log and continue
+                Log::warning('Duplicate entry detected: Serial Number: ' . $tempAsset->serial_number . ' or Asset Number: ' . $tempAsset->asset_number);
+                continue;
             }
         }
 
-
         // Remove all records from the load_temp_assets table after successful import
         DB::table('load_temp_assets')->truncate();
-        
-        
-        
-       
-       
-       return redirect()->route('assets.index')->with('success, File successfully imported');
 
-    //    return "File successfully imported";
+        return redirect()->route('assets.index')->with('success', 'File successfully imported');
+        
+    } catch (\Exception $e) {
+        // Log the actual error
+        Log::error('Import error: ' . $e->getMessage());
 
-    //    redirect()->route('assets.index')
-       
-    
+        // Return a generic error message to the front end
+        return redirect()->back()->with('error', 'Failed to import file. Please check your data and try again.');
     }
+}
+
+
+
+
 
 
 
@@ -167,7 +180,7 @@ class AssetController extends Controller
         
         $assetCategories = AssetCategory::all();
         
-        $insurances = Insurance::all();
+        // $insurances = Insurance::all();
         $locations = Location::all();
              
        
@@ -181,53 +194,75 @@ class AssetController extends Controller
      */
     public function store(StoreAssetRequest $request)
     {
-        // Validate the request
-        $validated = $request->validated();
+        try {
+            // Validate the request
+            $validated = $request->validated();
 
-        // Create the asset
-        $asset = Asset::create($validated);
+            // Create the asset
+            $asset = Asset::create($validated);
 
-        $currentUser = $request->user_id == 'other' ? $request->manual_current_user : $request->user_id;
-        $previousUser = $request->previous_user_id == 'other' ? $request->manual_previous_user : $request->previous_user_id;
+            $currentUser = $request->user_id == 'other' ? $request->manual_current_user : $request->user_id;
+            $previousUser = $request->previous_user_id == 'other' ? $request->manual_previous_user : $request->previous_user_id;
 
-        // Log the asset creation in asset history
-        AssetHistory::create([
-            'asset_id' => $asset->id,
-            'user_id' => auth()->id(),
-            'action' => 'created',
-            'description' => 'Asset was created.',
-        ]);
-
-        // Log the created asset for debugging
-        \Log::info('Asset created: ', $asset->toArray());
-
-        // Check if asset creation was successful
-        if (!$asset) {
-            return back()->withErrors(['asset' => 'Failed to create asset.']);
-        }
-
-        // Log changes in the audit trail for every column
-        foreach ($validated as $column => $newValue) {
-            AuditTrail::create([
-                'user_id'    => auth()->id(),
-                'table_name' => 'assets',
-                'column_name'=> $column,
-                'old_value'  => null, // No old value since it's a new record
-                'new_value'  => $newValue,
-                'action'     => 'create',
+            // Log the asset creation in asset history
+            AssetHistory::create([
+                'asset_id' => $asset->id,
+                'user_id' => auth()->id(),
+                'action' => 'created',
+                'description' => 'Asset was created.',
             ]);
+
+            // Log the created asset for debugging
+            \Log::info('Asset created: ', $asset->toArray());
+
+            // Check if asset creation was successful
+            if (!$asset) {
+                return back()->withErrors(['asset' => 'Failed to create asset.']);
+            }
+
+            // Log changes in the audit trail for every column
+            foreach ($validated as $column => $newValue) {
+                AuditTrail::create([
+                    'user_id'    => auth()->id(),
+                    'table_name' => 'assets',
+                    'column_name'=> $column,
+                    'old_value'  => null, // No old value since it's a new record
+                    'new_value'  => $newValue,
+                    'action'     => 'create',
+                ]);
+            }
+
+            // Notify admins about the new asset
+            $admins = User::whereHas('role', function($query) {
+                $query->where('name', 'admin');
+            })->get();
+
+            Notification::send($admins, new AssetCreated($asset));
+
+            // Redirect or return response
+            return redirect()->route('assets.index')->with('success', 'Asset created successfully.');
+            
+        } catch (\Illuminate\Database\QueryException $e) {
+            // Log the error message
+            \Log::error('Database error while creating asset: ' . $e->getMessage());
+
+            // Check for duplicate entry error (MySQL error code 1062)
+            if ($e->errorInfo[1] == 1062) {
+                return back()->withErrors(['error' => 'Duplicate entry detected: This asset already exists.']);
+            }
+
+            // Return a generic error message to the front-end
+            return back()->withErrors(['error' => 'An error occurred while creating the asset. Please try again later.']);
+
+        } catch (\Exception $e) {
+            // Log the error message
+            \Log::error('Error while creating asset: ' . $e->getMessage());
+
+            // Return a generic error message to the front-end
+            return back()->withErrors(['error' => 'An error occurred while creating the asset.']);
         }
-
-        // Notify admins about the new asset
-        $admins = User::whereHas('role', function($query) {
-            $query->where('name', 'admin');
-        })->get();
-
-        Notification::send($admins, new AssetCreated($asset));
-
-        // Redirect or return response
-        return redirect()->route('assets.index')->with('success', 'Asset created successfully.');
     }
+
 
 
 
@@ -240,7 +275,7 @@ class AssetController extends Controller
         $this->authorize('view', $asset); 
 
         // Load related data
-        $asset->load('assetCategories', 'vendors', 'departments', 'locations', 'users', 'insurances');
+        $asset->load('assetCategory', 'vendor', 'department', 'location', 'user');
 
         // Get all required data for form select options
         $assetCategories = AssetCategory::all();
@@ -248,35 +283,21 @@ class AssetController extends Controller
         
         $users = User::all();
         // $invoices = Invoice::all();
-        $insurances = Insurance::all();
+        // $insurances = Insurance::all();
+        $vendors = Vendor::all();
 
-        // If there is a search query, handle the search
-        if (request()->has('query')) {
-            $query = request()->query('query');
-            $searchResults = Asset::where('asset_name', 'like', "%$query%")
-                ->orWhere('asset_number', 'like', "%$query%")
-                ->orWhere('serial_number', 'like', "%$query%")
-                ->paginate(5);
+       
 
-            // Pass the search results to a different view (if needed)
-            return view('assets.search_results', compact('searchResults', 'assetCategories', 'vendors', 'departments', 'locations', 'users', 'invoices', 'insurances'));
-        }
-
-        return view('assets.show', compact('asset', 'assetCategories', 'users'));
+        return view('assets.show', compact('asset', 'assetCategories', 'users', 'vendors'));
     }
 
     public function itControlForm($id)
     {
         $asset = Asset::findOrFail($id);
-        return view('assets.it-control-form', compact('asset'));
+        return view('assets.pdf', compact('asset'));
     }
 
-    public function exportToPdf($id)
-    {
-        $asset = Asset::findOrFail($id);
-        $pdf = PDF::loadView('assets.it-control-form', compact('asset'));
-        return $pdf->download('it-control-form.pdf');
-    }
+    
 
 
     /**
@@ -296,9 +317,9 @@ class AssetController extends Controller
         
         $users = User::all();
         // $invoices = Invoice::all();
-        $insurances = Insurance::all();
+        // $insurances = Insurance::all();
         
-        return view('assets.edit', compact('asset', 'users', 'vendors', 'assetCategories', 'insurances','locations'));
+        return view('assets.edit', compact('asset', 'users', 'vendors', 'assetCategories','locations'));
     }
 
     /**
@@ -337,8 +358,8 @@ class AssetController extends Controller
             'category_id' => 'nullable|exists:asset_categories,id',
             'location_id' => 'nullable|exists:locations,id',
             'vendor_id' => 'nullable|exists:vendors,id',
-            'insurance_id' => 'nullable|exists:insurances,id',
-            'status' => 'required|string|max:255',
+            // 'insurance_id' => 'nullable|exists:insurances,id',
+            'status' => 'nullable|string|max:255',
         ]);
     
         // // Check if user_id has changed
@@ -412,6 +433,17 @@ class AssetController extends Controller
         return $description;
     }
 
+    public function downloadForm($assetId)
+    {
+        $asset = Asset::find($assetId); // Fetch the asset
+
+        // Load the view and pass the asset data to it
+        $pdf = Pdf::loadView('assets.pdf', compact('asset'));
+
+        // Download the PDF file
+        return $pdf->download('IT_Control_Form.pdf');
+    }
+
     /**
      * Remove the specified resource from storage.
      */
@@ -419,27 +451,23 @@ class AssetController extends Controller
     {
         $this->authorize('delete', $asset);
 
-        
-
-
         // Soft delete the asset (archive)
         $asset->delete();
-    
+        
         // Soft delete the related records in asset_history
-        $asset->asset_history()->delete();
+        $asset->assetHistory()->delete();
 
         $admins = User::whereHas('roles', function($query) {
             $query->where('name', 'admin');
         })->get();
-    
+        
         // Send notification to users about the asset archiving
-        // $users = User::all();
-        // Notification::send($users, new AssetDeleted($asset));
         Notification::send($admins, new AssetDeleted($asset));
-    
+        
         // Redirect or return response
         return redirect()->route('assets.index')->with('success', 'Asset archived successfully.');
     }
+
     
     
     
@@ -451,24 +479,17 @@ class AssetController extends Controller
 
     
 
-    // public function restore($id)
-    // {
-    //     // Find the asset in the trashed records
-    //     $asset = Asset::withTrashed()->findOrFail($id);
+    public function exportToPdf($id)
+    {
+        // Fetch the asset data using the id
+        $asset = Asset::findOrFail($id);
 
-        
-    //     $asset->restore();
+        // Load the view with the asset data
+        $pdf = PDF::loadView('assets.pdf', compact('asset'));
 
-        
-    //     $asset->asset_history()->restore();
-
-    //     // Notify users about the restoration
-    //     $users = User::all();
-    //     Notification::send($users, new AssetRestored($asset));
-
-    //     // Redirect or return response
-    //     return redirect()->route('assets.index')->with('success', 'Asset restored successfully.');
-    // }
+        // Stream or download the PDF
+        return $pdf->download('IT_Control_Form_' . $asset->id . '.pdf');
+    }
 
     public function restore($id)
     {
@@ -482,13 +503,5 @@ class AssetController extends Controller
         return redirect()->route('assets.index')->with('error', 'Asset cannot be restored.');
     }
     
-
-
-    
-
-
-
-    
-
     
 }

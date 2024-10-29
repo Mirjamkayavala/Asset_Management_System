@@ -18,7 +18,7 @@
         .container {
             max-width: 700px;
             width: 100%;
-            background-color: #fff;
+            background-color: #e4faf3;
             padding: 25px 30px;
             border-radius: 5px;
             box-shadow: 0 5px 10px rgba(0,0,0,0.15);
@@ -39,6 +39,7 @@
             height: 3px;
             width: 30px;
             border-radius: 5px;
+            /* background-color: transparent; */
             background: linear-gradient(135deg, #71b7e6, #9b59b6);
         }
         .content form .user-details {

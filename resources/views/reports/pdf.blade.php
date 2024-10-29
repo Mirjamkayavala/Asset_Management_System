@@ -18,7 +18,8 @@
 </head>
 <body>
     <div class="logo">
-        <img src="images/ceno-logo.png" alt="Company Logo" width="700" height="100"/>
+        <!-- Use absolute path to ensure PDF can load the image -->
+        <img src="{{ public_path('images/ceno.png') }}" alt="Company Logo" width="700" height="100"/>
     </div>
     <div class="statements">
         <p>All assets listed in this report are subject to periodic review and audit. For any discrepancies or updates, please contact the asset management department.</p>
@@ -46,12 +47,11 @@
                     <td>{{ $asset['model'] }}</td>
                     <td>{{ $asset['serial_number'] }}</td>
                     <td>{{ $asset['asset_number'] }}</td>
-                    <td>{{ $asset['category']  }}</td>
-                    <!-- <td>{{ $asset['category_name'] ?? 'N/A' }}</td> -->
+                    <td>{{ $asset['category_name'] ?? 'N/A' }}</td>
                     <td>{{ $asset['user_name'] ?? 'N/A' }}</td>
                     <td>{{ \Carbon\Carbon::parse($asset['date'])->format('Y-m-d') }}</td>
                     <td>{{ $asset['previousUser'] ?? 'N/A' }}</td>
-                    <td>{{ $asset['vendor']  }}</td>
+                    <td>{{ $asset['vendor'] }}</td>
                     <td>{{ $asset['status'] }}</td>
                 </tr>
             @endforeach

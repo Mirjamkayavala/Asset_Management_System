@@ -1,6 +1,6 @@
 <x-app-layout>
     <div class="container">
-        <h6>Assets Report</h6>
+        <h5>Assets Report</h5>
         <div class="statements">
             <p> All assets listed in this report are subject to periodic review and audit. For any discrepancies or updates, please contact the asset management department.</p>
         </div>

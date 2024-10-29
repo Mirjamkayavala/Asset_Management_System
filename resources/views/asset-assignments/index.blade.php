@@ -1,6 +1,6 @@
 <x-app-layout>
     <div class="container">
-        <h6>Asset Assignment History</h6>
+        <h6>Asset History</h6>
 
         <form action="{{ route('asset-assignments.clear') }}" method="POST" onsubmit="return confirm('Are you sure you want to clear all asset assignment records?');">
             @csrf
@@ -12,7 +12,7 @@
 
         @if($assignments->isEmpty())
             <div class="alert alert-info">
-                No assignments found.
+                No data found.
             </div>
         @else
             <table class="table table-bordered">

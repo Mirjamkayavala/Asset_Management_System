@@ -27,11 +27,12 @@ class AssetTempImport implements ToModel , WithHeadingRow
             'serial_number'=>$row['serial_number'],
             'asset_number'=>$row['asset_number'],
             'category'=>$row['category'],
-            'current_user'=>$row['current_user'],
-            'date'=>$row['date'],
-            'previous_user'=>$row['previous_user'],
-            'vendor'=>$row['vendor'],
-            'status'=>$row['status'],
+            // 'current_user'=>$row['current_user'],
+            'current_user'           => isset($row['current_user']) ? $row['current_user'] : null,
+            'date'           => isset($row['date']) ? $row['date'] : null,
+            'previous_user'  => isset($row['previous_user']) ? $row['previous_user'] : null,
+            'vendor'         => isset($row['vendor']) ? $row['vendor'] : null,
+            'status'         => isset($row['status']) ? $row['status'] : null,
         ]);
     }
 }

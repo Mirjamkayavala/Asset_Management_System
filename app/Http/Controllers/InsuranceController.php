@@ -17,7 +17,7 @@ class InsuranceController extends Controller
     public function index()
     {
 
-        if (Gate::denies('viewAny', Department::class)) {
+        if (Gate::denies('viewAny', Insurance::class)) {
             abort(403, 'Unauthorized');
         }
 

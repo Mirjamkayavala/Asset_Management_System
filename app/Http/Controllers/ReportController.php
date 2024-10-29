@@ -203,7 +203,7 @@ class ReportController extends Controller
         // Fetch the filtered assets
         $assets = $query->get();
 
-        $assets = Asset::with(['assetCategories', 'users', 'previousUser', 'vendors'])->get();
+        $assets = Asset::with(['assetCategory', 'user', 'previousUser', 'location'])->get();
 
         $headers = [
             'Make', 'Model', 'Serial Number', 'Asset Number','Category' ,'Current User',  'Date', 'Previous User','Vendor', 'Location','Status',
@@ -218,13 +218,14 @@ class ReportController extends Controller
                         'model' => $asset->model,
                         'serial_number' => $asset->serial_number,
                         'asset_number' => $asset->asset_number,
-                        'category' => $asset->category,
-                        // 'category_name' => optional($asset->assetCategories)->category_name ?? 'N/A',
+                        // 'category' => $asset->category,
+                        'category_name' => optional($asset->assetCategory)->category_name ?? 'N/A',
                         'user_name' => optional($asset->users)->name ?? 'N/A',
                         'date' => $asset->date,
                         'previousUser' => optional($asset->previousUser)->name ?? 'N/A',
                         'vendor' => $asset->vendor,
-                        'location' => $asset->location,
+                        // 'location' => $asset->location,
+                        'location_name' => optional($asset->locations)->location_name ?? 'N/A',
                         // 'vendor_name' => optional($asset->vendors)->vendor_name ?? 'N/A',
                         'status' => $asset->status,
                     ];
@@ -297,8 +298,8 @@ class ReportController extends Controller
                     $sheet->setCellValue('D' . $row, $asset->asset_number);
                     // $sheet->setCellValue('E' . $row, optional($asset->departments)->department_name ?? 'N/A');
                     $sheet->setCellValue('E' . $row, $asset->category);
-                    // $sheet->setCellValue('E' . $row, optional($asset->assetCategories)->category_name ?? 'N/A');
-                    // $sheet->setCellValue('G' . $row, optional($asset->locations)->location_name ?? 'N/A');
+                    $sheet->setCellValue('E' . $row, optional($asset->assetCategory)->category_name ?? 'N/A');
+                    $sheet->setCellValue('G' . $row, optional($asset->locations)->location_name ?? 'N/A');
                     $sheet->setCellValue('F' . $row, optional($asset->users)->name ?? 'N/A');
                     $sheet->setCellValue('G' . $row, $asset->date);
                     $sheet->setCellValue('H' . $row, optional($asset->previousUser)->name ?? 'N/A');
@@ -348,7 +349,7 @@ class ReportController extends Controller
                     $table->addCell()->addText($header, ['bold' => true]);
                 }
 
-                 
+                // $headers = ['Make', 'Model', 'Serial Number', 'Asset Number', 'Category','Current User','Date', 'Previous User',   'Vendor','Location', 'Status',];
                 // Add asset data rows
                 foreach ($assets as $asset) {
                     $table->addRow();
@@ -357,17 +358,20 @@ class ReportController extends Controller
                     $table->addCell()->addText($asset->serial_number);
                     $table->addCell()->addText($asset->asset_number);
                     // $table->addCell()->addText(optional($asset->departments)->department_name ?? 'N/A');
-                    $table->addCell()->addText($asset->category);
-                    // $table->addCell()->addText(optional($asset->assetCategories)->category_name ?? 'N/A');
-                    // $table->addCell()->addText(optional($asset->locations)->location_name ?? 'N/A');
+                    // $table->addCell()->addText($asset->category);
+                    $table->addCell()->addText(optional($asset->assetCategory)->category_name ?? 'N/A');
                     $table->addCell()->addText(optional($asset->users)->name ?? 'N/A');
                     $table->addCell()->addText($asset->date);
+                    // $table->addCell()->addText(optional($asset->locations)->location_name ?? 'N/A');
+                    // $table->addCell()->addText(optional($asset->users)->name ?? 'N/A');
+                    // $table->addCell()->addText($asset->date);
                     $table->addCell()->addText(optional($asset->previousUser)->name ?? 'N/A');
                     // $table->addCell()->addText(optional($asset->previousUser)->name ?? 'N/A');
                     $table->addCell()->addText($asset->vendor);
                     // $table->addCell()->addText(optional($asset->vendors)->vendor_name ?? 'N/A');
+                    $table->addCell()->addText(optional($asset->locations)->location_name ?? 'N/A');
                   
-                    $table->addCell()->addText($asset->location);
+                    // $table->addCell()->addText($asset->location);
                     $table->addCell()->addText($asset->status);
                     // $table->addCell()->addText($asset->warranty_expire_date);
                 }

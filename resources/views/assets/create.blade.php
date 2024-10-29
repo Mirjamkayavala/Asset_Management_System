@@ -256,8 +256,9 @@
                                 <option value="">Select Status</option>
                                 <option value="New" {{ old('status') == 'New' ? 'selected' : '' }}>New</option>
                                 <option value="Old" {{ old('status') == 'Old' ? 'selected' : '' }}>Old</option>
-                                <!-- <option value="In Use" {{ old('status') == 'In Use' ? 'selected' : '' }}>In Use</option>
-                                <option value="In Storage" {{ old('status') == 'In Storage' ? 'selected' : '' }}>In Storage</option> -->
+                                <option value="WrittenOff" {{ old('status') == 'WrittenOff' ? 'selected' : '' }}>Written Off</option>
+                                <option value="Broken" {{ old('status') == 'Broken' ? 'selected' : '' }}>Broken</option>
+                                <option value="In Storage" {{ old('status') == 'In Storage' ? 'selected' : '' }}>In Storage</option>
                             </select>
                             @error('asset_number')
                                 <div class="text-danger">{{ $message }}</div>

@@ -44,6 +44,10 @@ Route::get('/reports/export/filtered', [ReportController::class, 'exportFiltered
 // Assets
 Route::get('/assets/filter', [AssetController::class, 'filterByInvoiceNumber'])->name('assets.filterByInvoiceNumber');
 Route::get('/assets/{id}/it-control-form', [AssetController::class, 'itControlForm'])->name('assets.itControlForm');
+Route::get('/assets/{id}/export-pdf', [App\Http\Controllers\AssetController::class, 'exportToPdf'])->name('assets.exportToPdf');
+Route::get('/form/download/{asset}', [AssetController::class, 'downloadForm'])->name('form.download');
+
+
 Route::get('/assets/{id}/export-pdf', [AssetController::class, 'exportToPdf'])->name('assets.exportToPdf');
 Route::get('/assets/report', [AssetController::class, 'report'])->name('assets.report');
 Route::get('/assets/report/pdf', [AssetController::class, 'exportPdf'])->name('assets.report.pdf');

@@ -33,6 +33,7 @@ class UpdateInsuranceRequest extends FormRequest
             'rejection_date' => 'nullable|date|before_or_equal:today',
             'description' => 'nullable|string',
             'insurance_document' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
+            'serial_number' => 'required|exists:assets,serial_number',
         ];
     }
 }

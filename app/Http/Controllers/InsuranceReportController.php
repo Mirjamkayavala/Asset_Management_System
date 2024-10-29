@@ -49,7 +49,7 @@ class InsuranceReportController extends Controller
         $drawing->setWorksheet($sheet);
     
        // Define headers with a line break (adjust the starting row number)
-        $headers = ['ID', 'Asset', 'Assign To', 'Policy Number', 'Amount', 'Company', 'Status', 'Comments'];
+        $headers = ['ID', 'Make', 'Serial Number','Assign To', 'Policy Number', 'Amount', 'Company', 'Status', 'Comments'];
         $headerRow = 11; 
 
         // Set header row
@@ -69,13 +69,14 @@ class InsuranceReportController extends Controller
         $row = $headerRow + 1; 
         foreach ($insurances as $insurance) {
             $sheet->setCellValue('A' . $row, $insurance->id);
-            $sheet->setCellValue('B' . $row, optional($insurance->asset)->asset_name ?? 'N/A');
-            $sheet->setCellValue('C' . $row, optional($insurance->user)->name ?? 'N/A');
-            $sheet->setCellValue('D' . $row, $insurance->policy_number);
-            $sheet->setCellValue('E' . $row, $insurance->amount);
-            $sheet->setCellValue('F' . $row, $insurance->company);
-            $sheet->setCellValue('G' . $row, ucfirst($insurance->status));
-            $sheet->setCellValue('H' . $row, $insurance->description);
+            $sheet->setCellValue('B' . $row, optional($insurance->asset)->make ?? 'N/A');
+            $sheet->setCellValue('C' . $row, optional($insurance->asset)->serial_number ?? 'N/A');
+            $sheet->setCellValue('D' . $row, optional($insurance->user)->name ?? 'N/A');
+            $sheet->setCellValue('E' . $row, $insurance->claim_number);
+            $sheet->setCellValue('F' . $row, $insurance->amount);
+            $sheet->setCellValue('G' . $row, $insurance->company);
+            $sheet->setCellValue('H' . $row, ucfirst($insurance->status));
+            $sheet->setCellValue('I' . $row, $insurance->description);
             $row++;
         }
 
@@ -130,8 +131,9 @@ class InsuranceReportController extends Controller
         // Define the table headers
         $table->addRow();
         $table->addCell()->addText('ID', ['bold' => true]);
-        $table->addCell()->addText('Asset', ['bold' => true]);
-        $table->addCell()->addText('Assign To', ['bold' => true]);
+        $table->addCell()->addText('Make', ['bold' => true]);
+        $table->addCell()->addText('Serial Number', ['bold' => true]);
+        $table->addCell()->addText('Claimed By', ['bold' => true]);
         $table->addCell()->addText('Policy Number', ['bold' => true]);
         $table->addCell()->addText('Amount', ['bold' => true]);
         $table->addCell()->addText('Company', ['bold' => true]);
@@ -143,9 +145,10 @@ class InsuranceReportController extends Controller
         foreach ($insurances as $insurance) {
             $table->addRow();
             $table->addCell()->addText($insurance->id);
-            $table->addCell()->addText($insurance->asset ? $insurance->asset->asset_name : 'N/A');
+            $table->addCell()->addText($insurance->asset ? $insurance->asset->make : 'N/A');
+            $table->addCell()->addText($insurance->asset ? $insurance->asset->serial_number : 'N/A');
             $table->addCell()->addText($insurance->user ? $insurance->user->name : 'N/A');
-            $table->addCell()->addText($insurance->policy_number);
+            $table->addCell()->addText($insurance->claim_number);
             $table->addCell()->addText($insurance->amount);
             $table->addCell()->addText($insurance->company);
             $table->addCell()->addText(ucfirst($insurance->status));
@@ -168,14 +171,14 @@ class InsuranceReportController extends Controller
     {
         $query = Insurance::query();
 
-        if ($request->has('asset_name')) {
+        if ($request->has('make')) {
             $query->whereHas('asset', function($q) use ($request) {
-                $q->where('asset_name', 'like', '%' . $request->asset_name . '%');
+                $q->where('make', 'like', '%' . $request->make . '%');
             });
         }
 
-        if ($request->has('policy_number')) {
-            $query->where('policy_number', 'like', '%' . $request->policy_number . '%');
+        if ($request->has('claim_number')) {
+            $query->where('claim_number', 'like', '%' . $request->claim_number . '%');
         }
 
         if ($request->has('status')) {
