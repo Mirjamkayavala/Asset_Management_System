@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <x-login-style />
 </head>
-<body style="background-image: url('images/i-am.jpg'); background-size: cover; background-position: center;">
+<body style="background-image: url('images/one.jpeg'); background-size: cover; background-position: center;">
     <div class="container">
        
         <h3>Welcome to Inventory Management System</h3>

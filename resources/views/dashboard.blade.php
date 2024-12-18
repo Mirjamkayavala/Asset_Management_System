@@ -16,10 +16,7 @@
                 <p id="totalAssetsCount">{{ $totalAssets }}</p>
                 <h8>Total Assets</h8>
             </a>
-            <!-- <a href="javascript:void(0)" class="card" onclick="showAssetsInUseTable()">
-                <p id="inUseCount">{{ $In_UseCount }}</p>
-                <h8>Total assets in use</h8>
-            </a> -->
+            
             <a href="javascript:void(0)" class="card" onclick="showAssetsInStorageTable()">
                 <p id="inStorageCount">{{ $In_StorageCount }}</p>
                 <h8>Total assets available in storage</h8>
@@ -124,7 +121,7 @@
     </thead>
     <tbody>
         @foreach($assets as $asset)
-            @if($asset->status === 'In_Storage')
+            @if($asset->status === 'In_Storage' || $asset->status === 'In Storage')
                 <tr>
                     <td>{{ $asset->make }}</td>
                     <td>{{ $asset->model }}</td>

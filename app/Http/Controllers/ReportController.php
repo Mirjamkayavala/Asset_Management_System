@@ -14,6 +14,8 @@ use PhpOffice\PhpSpreadsheet\Style\Fill;
 use App\Models\AssetCategory;
 use App\Models\Location;
 use App\Models\Department;
+use App\Models\Facility;
+
 use App\Models\Vendor;
 use App\Models\User;
 use Carbon\Carbon;
@@ -25,7 +27,7 @@ class ReportController extends Controller
     {
         // Start a query builder for assets
         $assets = Asset::query();
-
+    
         // Apply filters based on the request parameters
         if ($request->filled('status')) {
             $assets->where('status', $request->status);
@@ -35,16 +37,89 @@ class ReportController extends Controller
             $assets->where('asset_number', $request->asset_number);
         }
 
-        if ($request->filled('category')) {
-            $assets->where('category', $request->category);
+        if ($request->filled('category_id')) {
+            $assets->where('category_id', $request->category_id);
         }
 
-        if ($request->filled('location')) {
-            $assets->where('location', $request->location);
+        if ($request->filled('location_id')) {
+            $assets->where('location_id', $request->location_id); 
         }
 
         if ($request->filled('model')) {
             $assets->where('model', $request->model);
+        }
+
+        if ($request->filled('make')) {
+            $assets->where('make', $request->make);
+        }
+        if ($request->filled('facility_id')) {
+            $assets->where('facility_id', $request->facility_id);
+        }
+
+        if ($request->filled('vendor')) {
+            $assets->where('vendor', $request->vendor);
+        }
+
+        if ($request->has('user_id') && $request->user_id !== null) {
+            $assets->where('user_id', $request->user_id);
+        }
+
+        // Add the date range filtering
+        if ($request->filled('start_date') && $request->filled('end_date')) {
+            $startDate = $request->start_date;
+            $endDate = Carbon::parse($request->end_date)->endOfDay(); // Include the full end day
+            $assets->whereBetween('created_at', [$startDate, $endDate]);
+        }
+
+        // Paginate the filtered assets (10 assets per page)
+        $assets = $assets->paginate(10); // You can change the number '10' to any value you prefer
+
+        // Pass additional data for the filter options (if needed)
+        $makes = Asset::select('make')->distinct()->get();
+        $models = Asset::select('model')->distinct()->get();
+        $locations = Location::all();
+        $vendors = Vendor::all();
+        $users = User::all();
+        $facilities = Facility::all();
+        $assetCategories = AssetCategory::all();
+
+        return view('reports.index', compact('assets', 'makes', 'models', 'locations', 'vendors', 'users', 'facilities', 'assetCategories'));
+    }
+
+    
+
+
+
+    private function getFilteredAssets(Request $request)
+    {
+        // Initialize the query for filtering assets
+        $assets = Asset::query();
+
+        // Debug the SQL query to see if it's being generated correctly
+        // dd($assets->toSql(), $assets->getBindings()); // Updated to use $assets
+        
+        // Apply filters based on the request parameters
+        if ($request->filled('status')) {
+            $assets->where('status', $request->status);
+        }
+
+        if ($request->filled('asset_number')) {
+            $assets->where('asset_number', $request->asset_number);
+        }
+
+        if ($request->filled('category_id')) {
+            $assets->where('category_id', $request->category_id);
+        }
+
+        if ($request->filled('location_id')) {
+            $assets->where('location_id', $request->location_id); // Corrected to use $assets
+        }
+
+        if ($request->filled('model')) {
+            $assets->where('model', $request->model);
+        }
+        if ($request->filled('facility_id')) {
+            $assets->where('facility_id', $request->facility_id);
         }
 
         if ($request->filled('make')) {
@@ -61,153 +136,37 @@ class ReportController extends Controller
 
         // Add the date range filtering
         if ($request->filled('start_date') && $request->filled('end_date')) {
-            // Ensure the end date includes the full day by adding 23:59:59
-            $startDate = $request->start_date;
-            $endDate = Carbon::parse($request->end_date)->endOfDay(); // Include the full end day
-
-            $assets->whereBetween('created_at', [$startDate, $endDate]);
+            $assets->whereBetween('created_at', [$request->start_date, $request->end_date]);
         }
 
-        // Fetch the filtered assets
-        $assets = $assets->get();
-
-        // Retrieve other necessary data
-        $makes = Asset::select('make')->distinct()->get();
-        $models = Asset::select('model')->distinct()->get();
-        $statuses = ['In use', 'New', 'Old', 'In Storage', 'Broken', 'Written Off'];
-        $locations = Location::all();
-
-        // Pass the filtered assets and other data to the view
-        return view('reports.index', compact('assets', 'makes', 'models', 'locations', 'statuses'));
+        // Get the filtered assets
+        return $assets->get();
     }
 
-
-
-    private function getFilteredAssets(Request $request)
-    {
-            // Initialize the query for filtering assets
-            $assets = Asset::query();
         
-            // Debug the SQL query to see if it's being generated correctly
-            // dd($query->toSql(), $query->getBindings()); 
-            
-        
-            // Apply filters based on the request parameters
-            if ($request->filled('status')) {
-                $assets->where('status', $request->status);
-            }
-        
-            if ($request->filled('asset_number')) {
-                $assets->where('asset_number', $request->asset_number);
-            }
-        
-            if ($request->filled('category')) {
-                $assets->where('category', $request->category);
-            }
-            if ($request->filled('location')) {
-                $assets->where('location', $request->location);
-            }
-        
-            if ($request->filled('model')) {
-                $assets->where('model', $request->model);
-            }
-        
-            if ($request->filled('make')) {
-                $assets->where('make', $request->make);
-            }
-        
-            if ($request->filled('vendor')) {
-                $assets->where('vendor', $request->vendor);
-            }
-        
-            if ($request->filled('user_id')) {
-                $assets->where('user_id', $request->user_id);
-            }
-
-            // Add the date range filtering
-            if ($request->filled('start_date') && $request->filled('end_date')) {
-                $assets->whereBetween('created_at', [$request->start_date, $request->end_date]);
-            }
-        
-            // Get the filtered assets
-            return $assets->get();
-    }
-        
-
 
     public function preview(Request $request)
     {
         $this->authorize('viewAny', Asset::class);
-        $assets = $this->getFilteredAssets($request);
+        $assets = Asset::query()
+            ->when($request->filled('filter'), function($query) use ($request) {
+                $query->where('name', 'like', '%' . $request->filter . '%');
+            })
+        ->paginate(10); 
 
+        // dd(request()->query());
         return view('reports.preview', compact('assets'));
     }
 
-    // public function exportPdf(Request $request)
-    // {
-    //     // Create query to filter assets
-    //     $query = Asset::with(['assetCategories', 'users', 'previousUser', 'vendors']);
-
-    //     // Apply filters from the request
-    //     if ($request->has('serial_number') && $request->serial_number != '') {
-    //         $query->where('serial_number', 'like', '%' . $request->serial_number . '%');
-    //     }
-    //     if ($request->has('asset_number') && $request->asset_number != '') {
-    //         $query->where('asset_number', 'like', '%' . $request->asset_number . '%');
-    //     }
-    //     if ($request->has('location') && $request->location != '') {
-    //         $query->where('location', $request->location);
-    //     }
-    //     if ($request->has('status') && $request->status != '') {
-    //         $query->where('status', $request->status);
-    //     }
-    //     if ($request->has('start_date') && $request->has('end_date')) {
-    //         $query->whereBetween('created_at', [$request->start_date, $request->end_date]);
-    //     }
-
-    //     // Get the filtered assets
-    //     $assets = $query->get();
-
-    //     // Set a timeout limit for large PDF generation
-    //     set_time_limit(120);
-
-    //     // Generate PDF with filtered assets
-    //     $pdf = PDF::loadView('report.pdf', compact('assets'));
-
-    //     // Return the generated PDF
-    //     return $pdf->download('Asset_report.pdf');
-    // }
-
-
+    
 
     public function export(Request $request, $format)
     {
-        // $assets = $this->getFilteredAssets($request);
-
-        // Get filtered assets based on the request
-        $assets = $this->getFilteredAssets($request);
-
-        $query = Asset::query();
-
-        // Example of filtering logic - adjust according to your filter inputs
-        if ($request->has('make')) {
-            $query->where('make', $request->input('make'));
-        }
-        if ($request->has('category')) {
-            $query->where('category', $request->input('category'));
-        }
-        if ($request->has('status')) {
-            $query->where('status', $request->input('status'));
-        }
-
-        // Fetch the filtered assets
-        $assets = $query->get();
-
-        $assets = Asset::with(['assetCategory', 'user', 'previousUser', 'location'])->get();
-
+        // Apply the filtering logic
+        $assets = $this->getFilteredAssets($request);  // Reuse the filtering logic
+        // Headers for the report
         $headers = [
-            'Make', 'Model', 'Serial Number', 'Asset Number','Category' ,'Current User',  'Date', 'Previous User','Vendor', 'Location','Status',
-            
+            'Make', 'Model', 'Serial Number', 'Asset Number', 'Category', 'Current User', 'Date', 'Vendor', 'Facility Space', 'Location', 'Status',
         ];
 
         switch ($format) {
@@ -218,138 +177,116 @@ class ReportController extends Controller
                         'model' => $asset->model,
                         'serial_number' => $asset->serial_number,
                         'asset_number' => $asset->asset_number,
-                        // 'category' => $asset->category,
                         'category_name' => optional($asset->assetCategory)->category_name ?? 'N/A',
-                        'user_name' => optional($asset->users)->name ?? 'N/A',
+                        'user_name' => optional($asset->user)->name ?? 'N/A',
                         'date' => $asset->date,
-                        'previousUser' => optional($asset->previousUser)->name ?? 'N/A',
                         'vendor' => $asset->vendor,
-                        // 'location' => $asset->location,
+                        'facility' => optional($asset->facility)->facility_name ?? 'N/A',
                         'location_name' => optional($asset->locations)->location_name ?? 'N/A',
-                        // 'vendor_name' => optional($asset->vendors)->vendor_name ?? 'N/A',
                         'status' => $asset->status,
                     ];
                 })->toArray();
-                
+
+                $assets = $this->getFilteredAssets($request);
 
                 $pdf = Pdf::loadView('reports.pdf', ['assets' => $assetsArray])
                     ->setOptions(['defaultFont' => 'sans-serif'])
                     ->setPaper('a4', 'landscape');
 
-                   
-                $pdf->getDomPDF()->add_info('Title', 'Assets Report');
-                // Add the logo to the PDF header
-                $pdf->getDomPDF()->getCanvas()->page_script(function ($pageNumber, $pageCount, $canvas, $fontMetrics) {
-                    $imagePath = public_path('images/ceno-logo.png');
-                    $canvas->image($imagePath, 10, 10, 100, 50);
-                });
-
-                
-                // return view('reports.pdf', compact('assets'));
                 return $pdf->download('assets_report.pdf');
 
-            case 'excel':
-                $spreadsheet = new Spreadsheet();
-                $sheet = $spreadsheet->getActiveSheet();
-
-                // Add the logo
-                $drawing = new \PhpOffice\PhpSpreadsheet\Worksheet\Drawing();
-                $drawing->setName('Logo');
-                $drawing->setDescription('Logo');
-                $drawing->setPath(public_path('images/ceno-logo.png')); 
-                $drawing->setHeight(5); // Height of the logo
-                $drawing->setWidth(700); // Width of the logo 
-                $drawing->setCoordinates('A1'); 
-                $drawing->setWorksheet($sheet);
-
-                $sheet->getRowDimension('1')->setRowHeight(40); 
-                $sheet->mergeCells('A6:J6'); 
-                $sheet->setCellValue('A6', 'Asset Report'); 
-                $sheet->getStyle('A6')->getFont()->setBold(true)->setSize(14);
+                case 'excel':
+                    $spreadsheet = new Spreadsheet();
+                    $sheet = $spreadsheet->getActiveSheet();
                 
-                $sheet->getStyle('A6')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-                $sheet->getStyle('A6')->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
-
-                // Add space after the title before the headers
-                $sheet->getRowDimension('2')->setRowHeight(40);
-
-                $headers = ['Make', 'Model', 'Serial Number', 'Asset Number', 'Category','Current User','Date', 'Previous User',   'Vendor','Location', 'Status',];
-                $headerRow = 7;
-                // Define header row
-                foreach ($headers as $key => $header) {
-                    // $cell = chr(65 + $key) . '11'; // Starting row after logo (e.g., row 7)
-                    $cell = chr(65 + $key) . $headerRow; 
-                    $sheet->setCellValue($cell, $header);
-
-                    // Make the header bold
-                    $sheet->getStyle($cell)->applyFromArray([
-                        'font' => [
-                            'bold' => true,
-                        ],
-            ]);
-                }
-
-                // Set asset data rows
-                $row = $headerRow + 1;
-                foreach ($assets as $asset) {
-                    $sheet->setCellValue('A' . $row, $asset->make);
-                    $sheet->setCellValue('B' . $row, $asset->model);
-                    $sheet->setCellValue('C' . $row, $asset->serial_number);
-                    $sheet->setCellValue('D' . $row, $asset->asset_number);
-                    // $sheet->setCellValue('E' . $row, optional($asset->departments)->department_name ?? 'N/A');
-                    $sheet->setCellValue('E' . $row, $asset->category);
-                    $sheet->setCellValue('E' . $row, optional($asset->assetCategory)->category_name ?? 'N/A');
-                    $sheet->setCellValue('G' . $row, optional($asset->locations)->location_name ?? 'N/A');
-                    $sheet->setCellValue('F' . $row, optional($asset->users)->name ?? 'N/A');
-                    $sheet->setCellValue('G' . $row, $asset->date);
-                    $sheet->setCellValue('H' . $row, optional($asset->previousUser)->name ?? 'N/A');
-                    // <td>{{ $asset->previousUser ? $asset->previousUser->name : 'N/A' }}</td>
-                    $sheet->setCellValue('I' . $row, $asset->vendor);
-                    $sheet->setCellValue('J' . $row, $asset->location);
-                    // $sheet->setCellValue('I' . $row, optional($asset->vendors)->vendor_name ?? 'N/A');
-                    $sheet->setCellValue('K' . $row, $asset->status);
-                    
-                    $row++;
-                }
-
-                $writer = new Xlsx($spreadsheet);
-                $fileName = 'assets_report.xlsx';
-                $writer->save(storage_path('app/' . $fileName));
-
-                return response()->download(storage_path('app/' . $fileName))->deleteFileAfterSend(true);
-
+                    // Add logo
+                    $drawing = new \PhpOffice\PhpSpreadsheet\Worksheet\Drawing();
+                    $drawing->setName('Logo');
+                    $drawing->setDescription('Logo');
+                    $drawing->setPath(public_path('images/ceno-logo.png'));
+                    $drawing->setHeight(4);
+                    $drawing->setWidth(700);
+                    $drawing->setCoordinates('A1');
+                    $drawing->setWorksheet($sheet);
+                
+                    $sheet->getRowDimension('1')->setRowHeight(40);
+                    $sheet->mergeCells('A8:J8');
+                    $sheet->setCellValue('A8', 'Asset Report');
+                    $sheet->getStyle('A8')->getFont()->setBold(true)->setSize(14);
+                    $sheet->getStyle('A8')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                    $sheet->getStyle('A8')->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+                
+                    // Add headers
+                    $headerRow = 9;
+                    foreach ($headers as $key => $header) {
+                        $cell = chr(65 + $key) . $headerRow;
+                        $sheet->setCellValue($cell, $header);
+                        $sheet->getStyle($cell)->applyFromArray(['font' => ['bold' => true]]);
+                    }
+                
+                    // Add asset data rows
+                    $row = $headerRow + 1;
+                    foreach ($assets as $asset) {
+                        $sheet->setCellValue('A' . $row, $asset->make);
+                        $sheet->setCellValue('B' . $row, $asset->model);
+                        $sheet->setCellValue('C' . $row, $asset->serial_number);
+                        $sheet->setCellValue('D' . $row, $asset->asset_number);
+                        $sheet->setCellValue('E' . $row, optional($asset->assetCategory)->category_name ?? 'N/A');
+                        $sheet->setCellValue('F' . $row, optional($asset->user)->name ?? 'N/A');
+                        $sheet->setCellValue('G' . $row, \Carbon\Carbon::parse($asset->date)->format('Y-m-d H:i:s'));
+                        $sheet->setCellValue('H' . $row, $asset->vendor);
+                        $sheet->setCellValue('I' . $row, optional($asset->facilities)->facility_name ?? 'N/A');
+                        $sheet->setCellValue('J' . $row, optional($asset->locations)->location_name ?? 'N/A');
+                        // $sheet->setCellValue('J' . $row, optional($asset->locations)->location_name ?? 'N/A');
+                        $sheet->setCellValue('K' . $row, $asset->status);
+                        $row++;
+                    }
+                
+                    // Add total number of assets at the bottom
+                    $totalAssets = count($assets); // Count total assets
+                    $totalRow = $row + 1; // Leave an empty row after the data
+                
+                    $sheet->mergeCells("A{$totalRow}:J{$totalRow}");
+                    $sheet->setCellValue("A{$totalRow}", "Total Assets: $totalAs sets");
+                    $sheet->getStyle("A{$totalRow}")->getFont()->setBold(true);
+                    $sheet->getStyle("A{$totalRow}")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                    $sheet->getStyle("A{$totalRow}")->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+                
+                    $assets = $this->getFilteredAssets($request);
+                
+                    $writer = new Xlsx($spreadsheet);
+                    $fileName = 'assets_report.xlsx';
+                    $writer->save(storage_path('app/' . $fileName));
+                
+                    return response()->download(storage_path('app/' . $fileName))->deleteFileAfterSend(true);
+                
             case 'word':
                 $phpWord = new PhpWord();
                 $section = $phpWord->addSection();
 
-                // Add the logo
+                // Add logo
                 $section->addImage(public_path('images/ceno-logo.png'), [
                     'width' => 500,
                     'height' => 100,
                     'alignment' => 'center',
                 ]);
 
-                // Add a line break between the logo and the header
-                $section->addTextBreak(1);
-
-                // Add the header
+                // Add header
                 $section->addText('Assets Report', ['bold' => true, 'size' => 16], ['alignment' => 'center']);
 
-                // Add table style
+                // Add table
                 $styleTable = ['borderSize' => 6, 'borderColor' => '999999'];
                 $phpWord->addTableStyle('Asset Table', $styleTable);
-
-                // Add table
                 $table = $section->addTable('Asset Table');
+
+                $assets = $this->getFilteredAssets($request);
 
                 // Add header row
                 $table->addRow();
                 foreach ($headers as $header) {
-                    // $table->addCell()->addText($header);
                     $table->addCell()->addText($header, ['bold' => true]);
                 }
 
-                // $headers = ['Make', 'Model', 'Serial Number', 'Asset Number', 'Category','Current User','Date', 'Previous User',   'Vendor','Location', 'Status',];
                 // Add asset data rows
                 foreach ($assets as $asset) {
                     $table->addRow();
@@ -357,23 +294,15 @@ class ReportController extends Controller
                     $table->addCell()->addText($asset->model);
                     $table->addCell()->addText($asset->serial_number);
                     $table->addCell()->addText($asset->asset_number);
-                    // $table->addCell()->addText(optional($asset->departments)->department_name ?? 'N/A');
-                    // $table->addCell()->addText($asset->category);
                     $table->addCell()->addText(optional($asset->assetCategory)->category_name ?? 'N/A');
-                    $table->addCell()->addText(optional($asset->users)->name ?? 'N/A');
-                    $table->addCell()->addText($asset->date);
-                    // $table->addCell()->addText(optional($asset->locations)->location_name ?? 'N/A');
-                    // $table->addCell()->addText(optional($asset->users)->name ?? 'N/A');
-                    // $table->addCell()->addText($asset->date);
-                    $table->addCell()->addText(optional($asset->previousUser)->name ?? 'N/A');
-                    // $table->addCell()->addText(optional($asset->previousUser)->name ?? 'N/A');
+                    $table->addCell()->addText(optional($asset->user)->name ?? 'N/A');
+                    // $table->addCell()->addText(\Carbon\Carbon::parse($asset->date)->format('Y-m-d H:i:s'));
+                    $table->addCell()->addText(\Carbon\Carbon::parse($asset->created_at)->format('Y-m-d H:i:s'));
+
                     $table->addCell()->addText($asset->vendor);
-                    // $table->addCell()->addText(optional($asset->vendors)->vendor_name ?? 'N/A');
+                    $table->addCell()->addText(optinal($asset->facility)->facility_name ?? 'N/A');
                     $table->addCell()->addText(optional($asset->locations)->location_name ?? 'N/A');
-                  
-                    // $table->addCell()->addText($asset->location);
                     $table->addCell()->addText($asset->status);
-                    // $table->addCell()->addText($asset->warranty_expire_date);
                 }
 
                 $writer = IOFactory::createWriter($phpWord, 'Word2007');
@@ -388,6 +317,7 @@ class ReportController extends Controller
     }
 
 
+
     public function showAssetsReport()
     {
         $assets = Asset::with(['assetCategories', 'users', 'vendors'])->get();
@@ -397,23 +327,5 @@ class ReportController extends Controller
    
 
 
-     // Display asset requisition form
-     public function showRequisitionForm($assetId)
-     {
-          $asset = Asset::with(['users', 'vendors'])->findOrFail($assetId);
-     
-          return view('reports.requisition', compact('asset'));
-     }
-     
-     // Export the requisition form as PDF
-     public function exportRequisitionFormToPdf($assetId)
-     {
-          $asset = Asset::with(['users', 'vendors'])->findOrFail($assetId);
-     
-          $pdf = Pdf::loadView('reports.requisition_pdf', compact('asset'))
-                    ->setPaper('a4', 'portrait');
-     
-          return $pdf->download('Asset_Requisition_Form.pdf');
-     }
      
 }

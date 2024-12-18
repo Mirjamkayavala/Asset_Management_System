@@ -83,46 +83,46 @@ class AuthenticatedSessionController extends Controller
         $roleMap = [
             'admin' => 1,
             'technician' => 2,
-            'costing_department' => 4,
+            'costing_department' => 3,
         ];
 
         // Return the mapped role ID, or default to 5 (viewer or normal_user)
-        return $roleMap[$ldapRole] ?? 5;
+        return $roleMap[$ldapRole] ?? 4;
     }
 
     /**
      * Handle an incoming authentication request.
      */
     public function store(LoginRequest $request): RedirectResponse
-    {
-        // Attempt to authenticate with LDAP
-        try {
-            $request->authenticate(); 
-            // Sync LDAP users to local database
-            $this->syncLdapUsers();
+{
+    // Attempt to authenticate with LDAP
+    try {
+        $request->authenticate(); 
+        // Sync LDAP users to local database
+        $this->syncLdapUsers();
 
-            // If LDAP login is successful, assign role and proceed
+        // If LDAP login is successful, assign role and proceed
+        $user = Auth::user();
+        $this->assignRoleToUser($request, $user);
+
+    } catch (\Exception $e) {
+        // LDAP authentication failed, now attempt local authentication
+        $credentials = $request->only('username', 'password');
+        
+        if (Auth::attempt($credentials)) {
             $user = Auth::user();
-            $this->assignRoleToUser($request, $user);
-
-        } catch (\Exception $e) {
-            // LDAP authentication failed, now attempt local authentication
-            $credentials = $request->only('username', 'password');
-            
-            if (Auth::attempt($credentials)) {
-                $user = Auth::user();
-                $this->assignRoleToUser($request, $user); // Assign role based on local authentication
-            } else {
-                return redirect()->back()->withErrors(['login' => 'Login failed. Please check your credentials.']);
-            }
+            $this->assignRoleToUser($request, $user); // Assign role based on local authentication
+        } else {
+            \Log::error('Login failed due to incorrect credentials.', ['username' => $request->username]);
+            return redirect()->back()->withErrors(['login' => 'Login failed. Please check your credentials.']);
         }
-
-        // Regenerate session on successful login
-        $request->session()->regenerate();
-
-        return redirect()->intended(route('dashboard', absolute: false));
     }
 
+    // Regenerate session on successful login
+    $request->session()->regenerate();
+
+    return redirect()->intended(route('dashboard', absolute: false));
+}
     /**
      * Assign a role to the user based on LDAP or local data.
      */
@@ -146,12 +146,18 @@ class AuthenticatedSessionController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
+        // Log the session timeout error
+        if (!Auth::check()) {
+            \Log::warning('System timeout: User session expired.', ['user_id' => optional(Auth::user())->id]);
+            return redirect('/login')->with('warning', 'System timeout.');
+        }
+    
         Auth::guard('web')->logout();
-
+    
         $request->session()->invalidate();
-
+    
         $request->session()->regenerateToken();
-
-        return redirect('/');
+    
+        return redirect('/')->with('warning', 'You have been logged out due to inactivity.');
     }
 }

@@ -20,12 +20,16 @@ class Asset extends Model
         'asset_number',
         'category',
         'date',
+        'price',
         'vendor',
         'location',
+        'facility',
         'previous_user_id', 
         'category_id',
         'location_id',
         'vendor_id',
+        'facility_id',
+        'storage',
         'status'
     ];
 
@@ -35,10 +39,21 @@ class Asset extends Model
         return $this->belongsTo(AssetCategory::class, 'category_id', 'id');
     }
 
-    public function location()
+    public function locations()
     {
         return $this->belongsTo(Location::class, 'location_id', 'id');
     }
+    
+    // public function location()
+    // {
+    //     return $this->belongsTo(Location::class);
+    // }
+
+    public function facility()
+    {
+        return $this->belongsTo(Facility::class, 'facility_id', 'id');
+    }
+
 
     public function vendor()
     {
@@ -66,6 +81,12 @@ class Asset extends Model
     {
         return $this->belongsTo(Department::class, 'department_id', 'id');
     }
+
+    public function insurances()
+    {
+        return $this->hasMany(Insurance::class, 'asset_id');
+    }
+
 
     // Relationship with insurances by asset's serial number
     public function insurancesBySerialNumber()

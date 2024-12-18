@@ -11,6 +11,8 @@ use App\Http\Requests\UpdateInsuranceRequest;
 use App\Jobs\UploadInsuranceDocument;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Log;
+
 
 class InsuranceController extends Controller
 {
@@ -24,7 +26,7 @@ class InsuranceController extends Controller
          // Fetch insurance records in descending order by 'created_at'
         $insurances = Insurance::with('asset', 'user')
             ->orderBy('created_at', 'DESC')
-            ->paginate(50);
+            ->paginate(10);
         $assets = Asset::all();
         $users = User::all();
 
@@ -57,6 +59,7 @@ class InsuranceController extends Controller
         return redirect()->route('insurances.index')->with('success', 'Insurance claim created successfully.');
     }
 
+
     public function show(Insurance $insurance)
     {
         $this->authorize('view', $insurance);
@@ -81,10 +84,11 @@ class InsuranceController extends Controller
 
         // Check if a new document is uploaded
         if ($request->hasFile('insurance_document')) {
-            // Store the new document and delete the old one if it exists
-            $filePath = $request->file('insurance_document')->store('insurance_document');
             
-            // Optionally, delete the old document file
+            $filePath = $request->file('insurance_document')->store('insurance_document');
+            Log::info($filePath);
+            
+            //delete the old document file
             if ($insurance->insurance_document) {
                 Storage::delete($insurance->insurance_document);
             }
@@ -115,5 +119,17 @@ class InsuranceController extends Controller
         $insurance->delete();
 
         return redirect()->route('insurances.index')->with('success', 'Insurance claim deleted successfully.');
+    }
+
+    // public function viewInsuranceDoc($filename){
+ 
+    public function viewInsuranceDoc(Insurance $insurance){
+        // dd($filename);
+        // $filepath ='insurance_document'.$filename;
+        // return Storage::path($insurance->insurance_document);
+
+        // return Storage::download($insurance->insurance_document);
+        return response()->file(storage_path('app/' . $insurance->insurance_document));
+
     }
 }

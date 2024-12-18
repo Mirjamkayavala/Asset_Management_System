@@ -1,102 +1,88 @@
 <x-app-layout>
     <div class="container">
+        <h6>View Insurance Claim</h6>
 
-        <!-- Display errors if any -->
-        @if ($errors->any())
-            <div class="alert alert-danger">
-                <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
-
-        <!-- Insurance Claim Details -->
-        <h6>Insurance Claim Details</h6>
-        <div class="card">
-            <div class="card-header">
-                Claim #{{ $insurance->claim_number ?? 'N/A' }}
-            </div>
-
+        <div class="card mb-3">
             <div class="card-body">
-                <table class="table table-bordered">
+                <div class="row">
+                    <div class="col-md-6 form-group">
+                        <label>Make</label>
+                        <input type="text" class="form-control" value="{{ $insurance->asset->make ?? 'N/A' }}" readonly>
+                    </div>
 
-                    <tr>
-                        <th>Make</th>
-                        <td>{{ $insurance->asset ? $insurance->asset->make : 'No asset assigned' }}</td>
-                    </tr>
-                    <tr>
-                        <th>Serial Number</th>
-                        <td>{{ $insurance->asset ? $insurance->asset->serial_number : 'No asset assigned' }}</td>
-                    </tr>
-                    <!-- Policy Number -->
-                    <tr>
-                        <th>Policy Number</th>
-                        <td>{{ $insurance->claim_number }}</td>
-                    </tr>
-
-                    <!-- Insurance Type -->
-                    <tr>
-                        <th>Insurance Type</th>
-                        <td>{{ $insurance->insurance_type }}</td>
-                    </tr>
-
-                    <!-- Asset -->
-
-
-                    <!-- Assigned To -->
-                    <tr>
-                        <th>Assigned To</th>
-                        <td>{{ $insurance->user ? $insurance->user->name : 'No user assigned' }}</td>
-                    </tr>
-
-                    <!-- Status -->
-                    <tr>
-                        <th>Status</th>
-                        <td>{{ ucfirst($insurance->status ?? 'Unknown') }}</td>
-                    </tr>
-
-                    <!-- Comments -->
-                    <tr>
-                        <th>Comments</th>
-                        <td>{{ $insurance->description }}</td>
-                    </tr>
-
-                    <!-- Claim Date -->
-                    <tr>
-                        <th>Claim Date</th>
-                        <td>{{ $insurance->claim_date }}</td>
-                    </tr>
-
-                    <!-- Approval Date -->
-                    <tr>
-                        <th>Approval Date</th>
-                        <td>{{ $insurance->approval_date}}</td>
-                    </tr>
-
-                    <!-- Rejection Date -->
-                    <tr>
-                        <th>Rejection Date</th>
-                        <td>{{ $insurance->rejection_date}}</td>
-                    </tr>
-
-                    <!-- Insurance Documents -->
-                    <tr>
-                        <th>Insurance Documents</th>
-                        <td>
-                            @if ($insurance->insurance_document)
-                                <a href="{{ asset('storage/' . $insurance->insurance_document) }}" target="_blank">View Document</a>
-                            @else
-                                No document uploaded
-                            @endif
-                        </td>
-                    </tr>
-                </table>
+                    <div class="col-md-6 form-group">
+                        <label>Asset Serial Number</label>
+                        <input type="text" class="form-control" value="{{ $insurance->serial_number }}" readonly>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- Back button -->
-        <a href="{{ route('insurances.index') }}" class="btn btn-primary mt-3">Back</a>
+        <div class="card mb-3">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 form-group">
+                        <label>Written Off Source</label>
+                        <input type="text" class="form-control" value="{{ $insurance->written_off_source }}" readonly>
+                    </div>
+
+                    <div class="col-md-6 form-group">
+                        <label>Last Person Assigned the Asset</label>
+                        <input type="text" class="form-control" value="{{ $insurance->lastUser->name ?? 'N/A' }}" readonly>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 form-group">
+                        <label>Amount</label>
+                        <input type="text" class="form-control" value="{{ number_format($insurance->amount, 2) }}" readonly>
+                    </div>
+
+                    <div class="col-md-6 form-group">
+                        <label>Status</label>
+                        <input type="text" class="form-control" value="{{ $insurance->status }}" readonly>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-12 form-group">
+                        <label>Insurance Document</label>
+                        @if($insurance->insurance_document)
+                            <input type="text" class="form-control" value="View Document" readonly>
+                            <a href="{{ route('view.insurance.Document',$insurance->id)}}" target="_blank" class="btn btn-link">View Document</a>
+                        @else
+                            <input type="text" class="form-control" value="No Document Available" readonly>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 form-group">
+                        <label>Claimed By</label>
+                        <input type="text" class="form-control" value="" readonly>
+                    </div>
+
+                    <div class="col-md-6 form-group">
+                        <label>Comments</label>
+                        <textarea class="form-control" rows="3" readonly>{{ $insurance->description }}</textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <a href="{{ route('insurances.index') }}" class="btn btn-secondary">Back</a>
+
     </div>
 </x-app-layout>

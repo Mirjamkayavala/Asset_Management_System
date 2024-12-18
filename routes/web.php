@@ -21,7 +21,9 @@ use App\Http\Controllers\{
     RolePermissionController,
     AssetCategoryController,
     AssetAssignmentController,
-    InsuranceReportController
+    InsuranceReportController,
+    FacilityController
+
 };
 
 // Landing page route
@@ -29,6 +31,9 @@ Route::get('/', function () {
     return view('auth.login');
 })->name('landing');
 
+
+
+Route::view('/test','layouts.test');
 // Search
 Route::get('/search', [SearchController::class, 'search'])->name('search');
 
@@ -56,9 +61,20 @@ Route::post('/assets/import', [AssetController::class, 'import'])->name('assets.
 Route::get('/assets/total_count', [AssetController::class, 'getTotalAssetCount'])->name('assets.total_count');
 Route::get('/search/assets', [AssetController::class, 'search'])->name('assets.search');
 Route::post('/transfer-temp-assets', [AssetController::class, 'transferTempAssetsToAssets']);
+Route::get('/assets/{id}/audit-trail', [AssetController::class, 'getAuditTrail'])->name('assets.audit-trail');
+
+Route::get('/assets/deleted', [AssetController::class, 'deletedAssets'])->name('assets.deleted');
+Route::post('/assets/{id}/restore', [AssetController::class, 'restore'])->name('assets.restore');
+Route::delete('/assets/{asset}/force-delete', [AssetController::class, 'forceDelete'])->name('assets.force-delete');
+
+Route::post('/assets/clear-archived', [AssetController::class, 'clearArchived'])->name('assets.clear-archived');
 
 
-Route::put('/assets/{id}/restore', [AssetController::class, 'restore'])->name('assets.restore');
+
+// Route::put('/assets/{id}/restore', [AssetController::class, 'restore'])->name('assets.restore');
+
+// Route::get('/assets/{id}/deleted', [AssetController::class, 'deletedAsset'])->name('assets.deleted');
+
 
 
 // Invoices
@@ -75,12 +91,24 @@ Route::get('/insurances/export/pdf', [InsuranceReportController::class, 'exportP
 Route::get('/insurances/export/excel', [InsuranceReportController::class, 'exportExcel'])->name('insurances.export.excel');
 Route::get('/insurances/export/word', [InsuranceReportController::class, 'exportWord'])->name('insurances.export.word');
 
+// Route::get('/insurance/{id}/document', [InsuranceController::class, 'viewDocument'])->name('insurance.viewDocument');
+Route::get('/insurance/{insurance}/document', [InsuranceController::class, 'viewInsuranceDoc'])->name('view.insurance.Document');
+
 // Audit Trails
 Route::get('/audit-trails', [AuditTrailController::class, 'index'])->name('audit-trails.index');
 Route::delete('/audit-trails/clear', [AuditTrailController::class, 'clear'])->name('audit-trails.clear');
 
 // Notifications
 Route::delete('/notifications/clearAll', [NotificationController::class, 'clearAll'])->name('notifications.clearAll');
+
+Route::post('/roles_permissions/assign-role/{user}', [RolePermissionController::class, 'assignRole'])->name('roles_permissions.assign_role');
+
+Route::post('/assign-asset', [AssetAssignmentController::class, 'assignAsset'])->name('assign.asset');
+Route::put('/update-asset/{id}', [AssetAssignmentController::class, 'updateAsset'])->name('update.asset');
+
+
+// Facility
+Route::resource('facilities', FacilityController::class);
 
 // Middleware-protected routes
 Route::middleware('auth')->group(function () {
@@ -124,6 +152,8 @@ Route::middleware('auth')->group(function () {
         Route::post('/store-permission', [RolePermissionController::class, 'storePermission'])->name('roles_permissions.store_permission');
         Route::get('/destroy-role/{id}', [RolePermissionController::class, 'destroyRole'])->name('roles_permissions.destroy_role');
         Route::get('/destroy-permission/{id}', [RolePermissionController::class, 'destroyPermission'])->name('roles_permissions.destroy_permission');
+        Route::get('/permissions/{id}/edit', [RolesPermissionsController::class, 'editPermission'])->name('roles_permissions.edit_permission');
+
     });
 });
 

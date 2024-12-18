@@ -69,10 +69,8 @@ class AssetPolicy
      */
     public function restore(User $user, Asset $asset)
     {
-        // Add logic for restoring an asset, if necessary
         return $user->hasPermission('restore-asset');
     }
-
     /**
      * Determine whether the user can permanently delete the model.
      */

@@ -1,5 +1,6 @@
 <x-app-layout>
     <h6 class="text-left">Roles and Permissions</h6>
+    
     @can('create', App\Models\Role::class)
     <section class="container mt-5">
         <div class="card">
@@ -11,12 +12,11 @@
         </div>
     </section>
     @endcan
-<!-- <button type="button" class="btn btn-primary mb-3" data-toggle="modal" data-target="#createRoleModal">Create Role</button> -->
+    
     <div class="container mt-5">
-        
-        
         <!-- Roles Section -->
         <h6>Roles</h6>
+        
         @if (session('success'))
             <div class="alert alert-success no-print">
                 {{ session('success') }}
@@ -26,7 +26,8 @@
         <table class="table table-bordered">
             <thead>
                 <tr>
-                    <th>Name</th>
+                    <th>Role Name</th>
+                    <th>Permissions</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -34,70 +35,22 @@
                 @foreach($roles as $role)
                     <tr>
                         <td>{{ $role->role_name }}</td>
-                       
+                        <td>
+                            @foreach($role->permissions as $permission)
+                                <span class="badge badge-info">{{ $permission->name }}</span>
+                            @endforeach
+                        </td>
                         <td>
                             @can('delete', $role)
-                            <a href="{{ route('roles_permissions.destroy_role', $role->id) }}" class="btn btn-danger btn-sm">
-                                <i class="fas fa-trash-alt"></i> 
-                            </a>
+                                <a href="{{ route('roles_permissions.destroy_role', $role->id) }}" class="btn btn-danger btn-sm">
+                                    <i class="fas fa-trash-alt"></i> 
+                                </a>
                             @endcan
                         </td>
-                        
                     </tr>
                 @endforeach
             </tbody>
         </table>
-        <br>
-        <br>
-        
-        <!-- Permissions Section -->
-        <h6>Permissions</h6>
-        @if (session('success'))
-            <div class="alert alert-success no-print">
-                {{ session('success') }}
-            </div>
-        @endif
-        @can('create', App\Models\Permission::class)
-        <section class="container mt-5">
-        <div class="card">
-            <div class="card-body text-left">
-                <button type="button" class="btn btn-primary mb-3" data-toggle="modal" data-target="#createPermissionModal">
-                    Create Permission
-                </button>
-            </div>
-        </div>
-        </section>
-        @endcan
-        <br>
-        <br>
-        <!-- <button type="button" class="btn btn-primary mb-3" data-toggle="modal" data-target="#createPermissionModal">Create Permission</button> -->
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($permissions as $permission)
-                    <tr>
-                        <td>{{ $permission->name }}</td>
-                        
-                        <td>
-                            @can('delete', $permission)
-                            <a href="{{ route('roles_permissions.destroy_permission', $permission->id) }}" class="btn btn-danger btn-sm">
-                                <i class="fas fa-trash-alt"></i> 
-                            </a>
-                            @endcan
-                           
-                        </td>
-                        
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
-        <br>
-        <br>
     </div>
     
     <!-- Create Role Modal -->
@@ -117,6 +70,17 @@
                             <label for="roleName">Role Name</label>
                             <input type="text" class="form-control" id="roleName" name="name" required>
                         </div>
+                        
+                        <div class="form-group">
+                            <label for="permissions">Assign Permissions</label>
+                            <div class="form-check">
+                                @foreach($permissions as $permission)
+                                    <input type="checkbox" class="form-check-input" name="permissions[]" value="{{ $permission->id }}" id="permission-{{ $permission->id }}">
+                                    <label class="form-check-label" for="permission-{{ $permission->id }}">{{ $permission->name }}</label><br>
+                                @endforeach
+                            </div>
+                        </div>
+                        
                         <button type="submit" class="btn btn-primary">Create Role</button>
                     </form>
                 </div>
@@ -147,9 +111,6 @@
             </div>
         </div>
     </div>
-    <br>
-    <br>
-    <br>
     
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
@@ -161,5 +122,4 @@
             });
         });
     </script>
-    
-    </x-app-layout>
+</x-app-layout>

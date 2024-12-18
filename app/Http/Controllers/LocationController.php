@@ -18,7 +18,7 @@ class LocationController extends Controller
     {
         $this->authorize('viewAny', Location::class);
         $users = User::all();
-        $locations = Location::with('region')->paginate(10);
+        $locations = Location::with('region')->paginate(50);
         // $locations = Location::with('region')->get();
         $regions = Region::all();
         return view('locations.index', compact('locations', 'users', 'regions'));

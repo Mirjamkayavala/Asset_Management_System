@@ -30,7 +30,7 @@ class AssetUpdated extends Notification implements ShouldQueue
         return (new MailMessage)
                     ->line('A new asset has been updated.')
                     ->action('View Asset', url('/assets/' . $this->asset->id))
-                    ->line('Thank you for using our application!');
+                    ->line('Thank you for using IT Inventory Management System!');
     }
 
     public function toDatabase($notifiable)

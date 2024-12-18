@@ -27,8 +27,8 @@ class AssetDeleted extends Notification implements ShouldQueue
     {
         return (new MailMessage)
                     ->line('A new asset has been deleted.')
-                    ->action('View Asset', url('/assets/' . $this->asset->id))
-                    ->line('Thank you for using our application!');
+                    ->action('Restore Asset', route('assets.deleted', ['id' => $this->asset->id]))
+                    ->line('Thank you for using our IT Inventory Management System!');
     }
 
     public function toDatabase($notifiable)

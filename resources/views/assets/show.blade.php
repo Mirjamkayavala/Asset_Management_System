@@ -1,32 +1,23 @@
 <x-app-layout>
     <div class="container">
         <h6>Asset Details</h6>
+        
         @if (session('success'))
             <div class="alert alert-success">
                 {{ session('success') }}
             </div>
         @endif
 
-        @if ($errors->any())
-            <div class="alert alert-danger">
-                <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
         <section class="container mt-5">
             <div class="card">
                 <div class="card-body text-left">
-                    <a href="{{ route('assets.itControlForm', $asset->id) }}" class="btn btn-outline-primary">
+                    <a href="{{ route('assets.itControlForm', $asset->id) }}" class="btn btn-outline-primary" target="_blank">
                         IT Control Form
                     </a>
                 </div>
             </div>
         </section>
         <br><br><br>
-
         
         <div class="card mb-3">
             <div class="card-body">
@@ -57,6 +48,7 @@
                 </div>
             </div>
         </div>
+        
         <div class="card mb-3">
             <div class="card-body">
                 <div class="row">
@@ -65,24 +57,20 @@
                         <input type="text" class="form-control" id="category" value="{{ $asset->assetCategory->category_name ?? 'N/A' }}" readonly>
                     </div>
                     <div class="col-md-6 mb-3">
-                        <label for="location">Location</label>
-                        <input type="text" class="form-control" id="location" value="{{ $asset->locations->location_name ?? 'N/A' }}" readonly>
+                        <label for="price">Price</label>
+                        <input type="number" class="form-control" id="price" value="{{ $asset->price }}" readonly>
                     </div>
-                    
                 </div>
             </div>
         </div>
-
+        
         <div class="card mb-3">
             <div class="card-body">
                 <div class="row">
-                    <!-- <div class="col-md-6 mb-3">
-                        <label for="category">Category</label>
-                        <input type="text" class="form-control" id="category" value="{{ $asset->category }}" readonly>
-                    </div> -->
-                    <div class="form-group">
-                        <label for="date">Date</label>
-                        <input type="date" class="form-control" id="date" value="{{ $asset->date }}" readonly>
+                    <div class="form-group col-md-12">
+                        <label for="location_id">Location</label>
+                        <input type="text" class="form-control" id="location_id" 
+                            value="{{ $asset->locations->location_name ?? 'N/A' }}" readonly> 
                     </div>
                 </div>
             </div>
@@ -91,38 +79,31 @@
         <div class="card mb-3">
             <div class="card-body">
                 <div class="row">
-                    <div class="form-group">
-                        <label for="location">Location</label>
-                        <input type="text" class="form-control" id="location" value="{{ $asset->location }}" readonly>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="card mb-3">
-            <div class="card-body">
-                <div class="row">
-                    <div class="form-group">
+                    <div class="form-group col-md-12">
                         <label for="user_or_vendor">Assigned to</label>
-                        <input type="text" class="form-control" id="user_or_vendor" value="
-                            @if($asset->user)
-                                {{ $asset->user->name }} (User)
-                            @elseif($asset->vendor)
-                                {{ $asset->vendor }} (Vendor)
-                            @else
-                                N/A
-                            @endif
-                        " readonly>
+                        <input type="text" class="form-control" id="user_or_vendor" 
+                            value="{{ $asset->user ? $asset->user->name . ' (User)' : ($asset->vendor ? $asset->vendor . ' (Vendor)' : ($asset->facility_id->facility_name ?? 'N/A')) }}" readonly>
                     </div>
                 </div>
             </div>
         </div>
 
+        <div class="card mb-3">
+            <div class="card-body">
+                <div class="row">
+                    <div class="form-group col-md-12">
+                        <label for="previous_user_id">Previous User</label>
+                        <input type="text" class="form-control" id="previous_user_id" 
+                            value="{{ $asset->previous_user_id ? $asset->previousUser->name : $asset->manual_previous_user }}" readonly> 
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <div class="card mb-3">
             <div class="card-body">
                 <div class="row">
-                    <div class="form-group">
+                    <div class="form-group col-md-12">
                         <label for="status">Status</label>
                         <input type="text" class="form-control" id="status" value="{{ $asset->status }}" readonly>
                     </div>

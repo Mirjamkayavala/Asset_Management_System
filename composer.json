@@ -11,6 +11,7 @@
         "laravel/framework": "^11.9",
         "laravel/tinker": "^2.9",
         "maatwebsite/excel": "*",
+        "owen-it/laravel-auditing": "^13.6",
         "phpoffice/phpspreadsheet": "*",
         "phpoffice/phpword": "^1.2",
         "pusher/pusher-php-server": "^7.2",

@@ -44,12 +44,12 @@ class AssetObserver
      */
     public function deleted(Asset $asset): void
     {
-        // AssetHistory::create([
-        //     'asset_id' => $asset->id,
-        //     'action' => 'deleted',
-        //     'description' => 'Asset deleted: ' . json_encode($asset->toArray()),
-        //     'user_id' => auth()->user()->id,
-        // ]);
+        AssetHistory::create([
+            'asset_id' => $asset->id,
+            'action' => 'deleted',
+            'description' => 'Asset deleted: ' . json_encode($asset->toArray()),
+            'user_id' => auth()->user()->id,
+        ]);
     }
 
     /**
@@ -70,11 +70,11 @@ class AssetObserver
      */
     public function forceDeleted(Asset $asset): void
     {
-        // AssetHistory::create([
-        //     'asset_id' => $asset->id,
-        //     'action' => 'force deleted',
-        //     'description' => 'Asset force deleted: ' . json_encode($asset->toArray()),
-        //     'user_id' => auth()->user()->id,
-        // ]);
+        AssetHistory::create([
+            'asset_id' => $asset->id,
+            'action' => 'force deleted',
+            'description' => 'Asset force deleted: ' . json_encode($asset->toArray()),
+            'user_id' => auth()->user()->id,
+        ]);
     }
 }

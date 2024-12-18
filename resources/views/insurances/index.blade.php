@@ -29,8 +29,8 @@
                 <tr>
                     <th>ID</th>
                     <th>Make</th>
-                    <th>Policy Number</th>
-                    <th>Insurance Type</th>
+                    <!-- <th>Policy Number</th> -->
+                    <!-- <th>Insurance Type</th> -->
                     <th>Amount</th>
                     <th>Status</th>
                     <th>Claimed By</th>
@@ -42,8 +42,8 @@
                     <tr>
                         <td>{{ $insurance->id }}</td>
                         <td>{{ $insurance->asset->make ?? 'N/A' }}</td>
-                        <td>{{ $insurance->claim_number }}</td>
-                        <td>{{ $insurance->insurance_type }}</td>
+                        <!-- <td>{{ $insurance->claim_number }}</td> -->
+                        <!-- <td>{{ $insurance->insurance_type }}</td> -->
                         <td>{{ $insurance->amount }}</td>
                         <td>{{ $insurance->status }}</td>
                         <td>{{ $insurance->user->name ?? 'N/A' }}</td>

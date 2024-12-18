@@ -1,180 +1,185 @@
 <x-app-layout>
-<div class="container">
-    @if ($errors->any())
-        <div class="alert alert-danger">
-            <ul>
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
-
-    <h6>Update Data</h6>
-    <form action="{{ route('insurances.update', $insurance->id) }}" method="POST" enctype="multipart/form-data">
-        @csrf
-        @method('PUT')
-
-        <div class="card mb-3">
-            <div class="card-body">
-                    
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label for="asset_id">Make</label>
-                        <select name="asset_id" id="asset_id" class="form-control">
-                            @foreach ($assets as $asset)
-                                <option value="{{ $asset->id }}" {{ $asset->id == $insurance->asset_id ? 'selected' : '' }}>
-                                    {{ $asset->make }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="serial_number">Asset Serial Number</label>
-                        <select name="serial_number" id="serial_number" class="form-control" required>
-                            <option value="">Select Serial Number</option>
-                            @foreach($assets as $asset)
-                                <option value="{{ $asset->serial_number }}" {{ $insurance->serial_number == $asset->serial_number ? 'selected' : '' }}>
-                                    {{ $asset->serial_number }} - {{ $asset->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    
-                </div>
-                    
+    <div class="container">
+        <h6>Edit Insurance Claim</h6>
+        @if($errors->any())
+            <div class="alert alert-danger">
+                <ul>
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
             </div>
-        </div>
+        @endif
+        <form action="{{ route('insurances.update', $insurance->id) }}" method="POST" enctype="multipart/form-data">
+            @csrf
+            @method('PUT')
 
-        <div class="card mb-3">
-            <div class="card-body">
-                    
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label for="claim_number">Policy Number</label>
-                        <input type="text" name="claim_number" id="claim_number" class="form-control" value="{{ $insurance->claim_number }}">
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="insurance_type">Insurance Type</label>
-                        <input type="text" name="insurance_type" id="insurance_type" class="form-control" value="{{ $insurance->insurance_type }}">
-                    </div>
-                    
-                </div>
-            </div>
-        </div>
+            <div class="card mb-3">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label for="asset_id">Make</label>
+                            <select class= "form-control select2" name="asset_id" id="asset_id" class="form-control select2">
+                                <option value="">Select a Make</option>
+                                @foreach($assets as $asset)
+                                    <option value="{{ $asset->id }}" {{ $insurance->asset_id == $asset->id ? 'selected' : '' }}>{{ $asset->make }}</option>
+                                @endforeach
+                            </select>
+                            @error('asset_id')
+                                <div class="text-danger">{{ $message }}</div>
+                            @enderror
+                        </div>
 
-        <div class="card mb-3">
-            <div class="card-body">
-                    
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label for="amount">Amount</label>
-                        <input type="number" name="amount" id="amount" class="form-control" value="{{ $insurance->amount }}">
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="user_id">Claimed By</label>
-                        <select name="user_id" id="user_id" class="form-control">
-                            @foreach ($users as $user)
-                                <option value="{{ $user->id }}" {{ $user->id == $insurance->user_id ? 'selected' : '' }}>
-                                    {{ $user->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    
-                </div>
-            </div>
-        </div>
-
-        <div class="card mb-3" id="claim-date-section">
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label for="status">Status</label>
-                        <select name="status" id="status" class="form-control" required>
-                            <option value="Approved" {{ $insurance->status == 'Approved' ? 'selected' : '' }}>Approved</option>
-                            <option value="Claimed" {{ $insurance->status == 'Claimed' ? 'selected' : '' }}>Claimed</option>
-                            <option value="Rejected" {{ $insurance->status == 'Rejected' ? 'selected' : '' }}>Rejected</option>
-                        </select>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="claim_date">Claim Date</label>
-                        <input type="date" name="claim_date" id="claim_date" class="form-control" value="{{ $insurance->claim_date }}">
-                    </div>
-
-                    
-                </div>
-            </div>
-        </div>
-
-        <div class="card mb-3" id="rejection-date-section">
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label for="approval_date">Approval Date</label>
-                        <input type="date" name="approval_date" id="approval_date" class="form-control" value="{{ $insurance->approval_date }}">
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="rejection_date">Rejection Date</label>
-                        <input type="date" name="rejection_date" id="rejection_date" class="form-control" value="{{ $insurance->rejection_date }}">
-                    </div>
-
-                    
-                </div>
-            </div>
-        </div>
-
-        <div class="card mb-3">
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label for="description">Comments</label>
-                        <textarea name="description" id="description" class="form-control">{{ $insurance->description }}</textarea>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="insurance_document">Insurance Documents</label>
-                        @if($insurance->insurance_document)
-                            <div class="mb-2">
-                                <a href="{{ asset('storage/' . $insurance->insurance_document) }}" target="_blank">View current document</a>
-                                <button type="button" class="btn btn-danger btn-sm" id="remove-document">Remove</button>
-                            </div>
-                        @endif
-                        <input type="file" name="insurance_document" id="insurance_document" class="form-control">
-                        <input type="hidden" name="existing_insurance_document" id="existing_insurance_document" value="{{ $insurance->insurance_document }}">
+                        <div class="col-md-6 form-group">
+                            <label for="serial_number">Asset Serial Number</label>
+                            <input type="text" name="serial_number" id="serial_number" class="form-control" value="{{ old('serial_number', $insurance->serial_number) }}" required>
+                            @error('serial_number')
+                                <div class="text-danger">{{ $message }}</div>
+                            @enderror
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <a href="{{ route('insurances.index') }}" class="btn btn-secondary">Back</a>
-        <button type="submit" class="btn btn-primary">Update</button>
-    </form>
-</div>
+            <div class="card mb-3">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label for="written_off_source">Written Off Source</label>
+                            <select class= "form-control select2" name="written_off_source" id="written_off_source" class="form-control" onchange="toggleInsuranceDocumentField()">
+                                <option value="">Select Option</option>
+                                <option value="Internal" {{ $insurance->written_off_source == 'Internal' ? 'selected' : '' }}>Internal</option>
+                                <option value="External" {{ $insurance->written_off_source == 'External' ? 'selected' : '' }}>External</option>
+                            </select>
+                            @error('written_off_source')
+                                <div class="text-danger">{{ $message }}</div>
+                            @enderror
+                        </div>
 
-<script>
-    function toggleFields() {
-        const status = document.getElementById('status').value;
-        const claimDateSection = document.getElementById('claim-date-section');
-        const rejectionDateSection = document.getElementById('rejection-date-section');
+                        <div class="col-md-6 form-group">
+                            <label for="last_user_id">Last Person to Assigned Asset</label>
+                            <select class= "form-control select2" name="last_user_id" id="last_user_id" class="form-control select2" required>
+                                <option value="">Select Last person to Use the Asset</option>
+                                @foreach($users as $user)
+                                    <option value="{{ $user->id }}" {{ $insurance->last_user_id == $user->id ? 'selected' : '' }}>{{ $user->name }}</option>
+                                @endforeach
+                            </select>
+                            @error('last_user_id')
+                                <div class="text-danger">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-        if (status === 'Claimed') {
-            claimDateSection.style.display = 'block';
-            rejectionDateSection.style.display = 'none';
-        } else if (status === 'Rejected') {
-            claimDateSection.style.display = 'none';
-            rejectionDateSection.style.display = 'block';
-        } else {
-            claimDateSection.style.display = 'block';
-            rejectionDateSection.style.display = 'block';
+            <div class="card mb-3">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label for="amount">Amount</label>
+                            <input type="number" name="amount" id="amount" value="{{ old('amount', $insurance->amount) }}" class="form-control" required>
+                            @error('amount')
+                                <div class="text-danger">{{ $message }}</div>
+                            @enderror   
+                        </div>
+
+                        <div class="col-md-6 form-group">
+                            <label for="status">Status</label>
+                            <select class= "form-control select2" name="status" id="status" class="form-control">
+                                <option value="Approved" {{ $insurance->status == 'Approved' ? 'selected' : '' }}>Approved</option>
+                                <option value="Pending" {{ $insurance->status == 'Pending' ? 'selected' : '' }}>Pending</option>
+                                <option value="Claimed" {{ $insurance->status == 'Claimed' ? 'selected' : '' }}>Claimed</option>
+                                <option value="Rejected" {{ $insurance->status == 'Rejected' ? 'selected' : '' }}>Rejected</option>
+                            </select>
+                            @error('status')
+                                <div class="text-danger">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-3">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-12 form-group">
+                            <label for="insurance_document">Insurance Document</label>
+                            <input type="file" name="insurance_document" id="insurance_document" class="form-control">
+                            
+                            @if($insurance->insurance_document)
+                                <p>Current Document: 
+                                    <a href="{{ route('view.insurance.Document',$insurance->id)}}" target="_blank">View Document</a>
+                                </p>
+                            @endif
+
+                            @error('insurance_document')
+                                <div class="text-danger">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="card mb-3">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="form-group col-md-6">
+                            <label for="user_id">Claimed By</label>
+                            <select class= "form-control select2" class="form-control select2" name="user_id" id="user_id" required>
+                                <option value="">Select employee</option>
+                                @foreach($users as $user)
+                                    <option value="{{ $user->id }}" {{ $insurance->user_id == $user->id ? 'selected' : '' }}>{{ $user->name }}</option>
+                                @endforeach
+                            </select>
+                            @error('user_id')
+                                <div class="text-danger">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="col-md-6 form-group">
+                            <label for="description">Comments</label>
+                            <input type="text" name="description" id="description" value="{{ old('description', $insurance->description) }}" class="form-control">
+                            @error('description')
+                                <div class="text-danger">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <a href="{{ route('insurances.index') }}" class="btn btn-secondary mr-2">Back</a>
+            <button type="submit" class="btn btn-primary">Update</button>
+        </form>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <script>
+        function toggleInsuranceDocumentField() {
+            const writtenOffSource = document.getElementById('written_off_source').value;
+            const insuranceDocumentField = document.getElementById('insurance_document').parentElement;
+            
+            if (writtenOffSource === 'External') {
+                insuranceDocumentField.style.display = 'block';
+            } else {
+                insuranceDocumentField.style.display = 'none';
+            }
         }
-    }
 
-    document.getElementById('status').addEventListener('change', toggleFields);
+        document.addEventListener('DOMContentLoaded', function() {
+            toggleInsuranceDocumentField();
+        });
 
-    // Initial call to set the fields based on the loaded status
-    toggleFields();
-</script>
+        $(document).ready(function() {
 
+            $('.select2').select2({
+                placeholder: "Select an option",
+                allowClear: true
+            });
+        });
+
+    </script>
 </x-app-layout>

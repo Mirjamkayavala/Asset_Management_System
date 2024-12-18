@@ -23,7 +23,7 @@ class StoreLocationRequest extends FormRequest
     {
         return [
             'location_name' => 'required|string|max:255',
-            'contact_information' => 'required|string|max:255',
+            'contact_information' => 'nullable|string|max:255',
             'region_id' => 'required|exists:regions,id',
         ];
     }

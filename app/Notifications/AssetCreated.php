@@ -30,7 +30,7 @@ class AssetCreated extends Notification implements ShouldQueue
             ->subject('New Asset Added')
             ->line('A new asset has been added to the system.')
             ->action('View Asset', route('assets.show', $this->asset->id))
-            ->line('Thank you for using our application!');
+            ->line('Thank you for using IT Inventory Management System!');
             
        
     }

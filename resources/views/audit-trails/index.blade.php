@@ -18,7 +18,7 @@
             <table class="table table-bordered">
                 <thead>
                     <tr>
-                        <th>User</th>
+                        <!-- <th>User</th> -->
                         <th>Table Name</th>
                         <th>Column Name</th>
                         <th>Old Value</th>
@@ -30,7 +30,7 @@
                 <tbody>
                     @foreach ($auditTrails as $auditTrail)
                     <tr>
-                        <td>{{ $auditTrail->user->name }}</td>
+                        <!-- <td>{{ $auditTrail->user->name }}</td> -->
                         <td>{{ $auditTrail->table_name }}</td>
                         <td>{{ $auditTrail->column_name }}</td>
                         <td>{{ $auditTrail->old_value }}</td>

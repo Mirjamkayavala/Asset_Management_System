@@ -17,13 +17,26 @@ return new class extends Migration
             $table->string('model')->nullable();
             $table->string('serial_number')->nullable();
             $table->string('asset_number')->nullable();
-            $table->string('category')->nullable();
-            $table->string('current_user')->nullable();
+            // $table->string('category')->nullable();
+            $table->unsignedBigInteger('user_id')->nullable();
             $table->string('date')->nullable();
-            $table->string('previous_user')->nullable();
+            $table->unsignedBigInteger('previous_user_id')->nullable();
+            $table->unsignedBigInteger('facility_id')->nullable();
             $table->string('vendor')->nullable();
+            $table->unsignedBigInteger('category_id')->nullable(); 
+            $table->unsignedBigInteger('location_id')->nullable(); 
+            // $table->unsignedBigInteger('vendor_id')->nullable(); 
+            $table->string('facility')->nullable();
             $table->string('status')->nullable();
-            $table->timestamps(); // Created at and updated at timestamps
+            $table->timestamps(); 
+
+            // Define foreign keys
+            $table->foreign('user_id')->references('id')->on('users');
+            $table->foreign('previous_user_id')->references('id')->on('users')->onDelete('set null');
+            $table->foreign('category_id')->references('id')->on('asset_categories');
+            $table->foreign('facility_id')->references('id')->on('facilities');
+            $table->foreign('location_id')->references('id')->on('locations');
+            // $table->foreign('vendor_id')->references('id')->on('vendors');
 
         });
     }

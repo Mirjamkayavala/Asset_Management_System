@@ -38,5 +38,10 @@ class AssetHistory extends Model
     {
         return $this->belongsTo(User::class, 'assigned_by');
     }
+
+    public function assignedBy()
+    {
+        return $this->belongsTo(User::class, 'assigned_by');
+    }
 }
 

@@ -26,36 +26,40 @@
     </div>
 
     <table class="table table-striped table-bordered">
-        <thead>
+    <thead>
+        <tr>
+            <th>Make</th>
+            <th>Model</th>
+            <th>Serial Number</th>
+            <th>Asset No</th>
+            <th>Category</th>
+            <th>Assign To</th>
+            <th>Date</th>
+            <th>Vendor</th>
+            <th>Facility Space</th>
+            <th>Location</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach($assets as $asset)
             <tr>
-                <th>Make</th>
-                <th>Model</th>
-                <th>Serial Number</th>
-                <th>Asset No</th>
-                <th>Category</th>
-                <th>Current User</th>
-                <th>Date</th>
-                <th>Previous User</th>
-                <th>Vendor</th>
-                <th>Status</th>
+                <td>{{ $asset['make'] }}</td>
+                <td>{{ $asset['model'] }}</td>
+                <td>{{ $asset['serial_number'] }}</td>
+                <td>{{ $asset['asset_number'] }}</td>
+                <td>{{ $asset['category_name'] }}</td>
+                <td>{{ $asset['user_name'] }}</td>
+                <td>{{ \Carbon\Carbon::parse($asset['date'])->format('Y-m-d H:i:s') }}</td>
+                
+                <td>{{ $asset['vendor'] }}</td>
+                <td>{{ $asset['facility'] }}</td>
+                <td>{{ $asset['location_name'] }}</td>
+                <td>{{ $asset['status'] }}</td>
             </tr>
-        </thead>
-        <tbody>
-            @foreach($assets as $asset)
-                <tr>
-                    <td>{{ $asset['make'] }}</td>
-                    <td>{{ $asset['model'] }}</td>
-                    <td>{{ $asset['serial_number'] }}</td>
-                    <td>{{ $asset['asset_number'] }}</td>
-                    <td>{{ $asset['category_name'] ?? 'N/A' }}</td>
-                    <td>{{ $asset['user_name'] ?? 'N/A' }}</td>
-                    <td>{{ \Carbon\Carbon::parse($asset['date'])->format('Y-m-d') }}</td>
-                    <td>{{ $asset['previousUser'] ?? 'N/A' }}</td>
-                    <td>{{ $asset['vendor'] }}</td>
-                    <td>{{ $asset['status'] }}</td>
-                </tr>
-            @endforeach
-        </tbody>
-    </table>
+        @endforeach
+    </tbody>
+</table>
+
 </body>
 </html>

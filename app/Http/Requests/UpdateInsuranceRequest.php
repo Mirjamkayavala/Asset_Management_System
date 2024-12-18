@@ -25,15 +25,17 @@ class UpdateInsuranceRequest extends FormRequest
             'asset_id' => 'required|exists:assets,id',
             'insurance_type' => 'nullable|string|max:255',
             'claim_number' => 'nullable|string|max:255',
+            'written_off_source' => 'nullable|string|in:Internal,External',
             'amount' => 'required|numeric',
             'user_id' => 'required|exists:users,id',
+            'last_user_id' => 'required|exists:users,id',
             'status' => 'required|in:Approved,Claimed,Rejected',
             'claim_date' => 'nullable|date|before_or_equal:today',
             'approval_date' => 'nullable|date|before_or_equal:today',
             'rejection_date' => 'nullable|date|before_or_equal:today',
             'description' => 'nullable|string',
             'insurance_document' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
-            'serial_number' => 'required|exists:assets,serial_number',
+            'serial_number' => 'nullable|string|exists:assets,serial_number|max:255',
         ];
     }
 }

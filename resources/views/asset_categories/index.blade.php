@@ -35,7 +35,7 @@
                     <tr>
                         <th>ID</th>
                         <th>Category Name</th>
-                        <th>Category Code</th>
+                        <!-- <th>Category Code</th> -->
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -49,7 +49,7 @@
                         <tr>
                             <td>{{ $category->id }}</td>
                             <td>{{ $category->category_name }}</td>
-                            <td>{{ $category->category_code }}</td>
+                            <!-- <td>{{ $category->category_code }}</td> -->
                             <td>
                                 <!-- Button trigger modal for Edit -->
                                 @can('update', $category)

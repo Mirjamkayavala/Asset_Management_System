@@ -15,11 +15,11 @@ return new class extends Migration
             $table->id();
             
             $table->unsignedBigInteger('user_id')->nullable(); // Make this nullable for onDelete('set null')
-            $table->string('claim_number')->unique();
-            $table->string('insurance_type');
+            $table->string('claim_number')->unique()->nullable();
+            $table->string('insurance_type')->nullable();
             $table->enum('status', ['claimed', 'approved', 'rejected', 'pending']);
             $table->decimal('amount', 10, 2)->nullable();
-            $table->text('description');
+            $table->text('description')->nullable();
             $table->date('claim_date')->nullable();
             $table->date('approval_date')->nullable();
             $table->date('rejection_date')->nullable();

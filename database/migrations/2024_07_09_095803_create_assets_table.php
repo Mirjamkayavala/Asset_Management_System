@@ -18,10 +18,13 @@ return new class extends Migration
             $table->string('serial_number')->unique()->nullable(); 
             $table->unsignedBigInteger('user_id')->nullable(); 
             $table->string('asset_number')->unique()->nullable(); 
-            $table->string('category')->nullable();
+            // $table->string('category')->nullable();
             $table->string('vendor')->nullable();
-            $table->string('location')->nullable();
-            $table->date('date');
+            $table->string('facility')->nullable();
+            $table->unsignedBigInteger('facility_id')->nullable();
+            $table->decimal('price', 10, 2)->nullable();
+            // $table->string('location')->nullable();
+            $table->date('date')->nullable();
             $table->unsignedBigInteger('previous_user_id')->nullable(); 
             $table->unsignedBigInteger('category_id')->nullable(); 
             $table->unsignedBigInteger('location_id')->nullable(); 
@@ -36,6 +39,7 @@ return new class extends Migration
             $table->foreign('previous_user_id')->references('id')->on('users')->onDelete('set null');
             $table->foreign('category_id')->references('id')->on('asset_categories');
             $table->foreign('location_id')->references('id')->on('locations');
+            $table->foreign('facility_id')->references('id')->on('facilities');
             $table->foreign('vendor_id')->references('id')->on('vendors');
             // $table->foreign('insurance_id')->references('id')->on('insurances');
         });

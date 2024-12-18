@@ -13,42 +13,30 @@
         @if ($notifications->isEmpty())
             <p>No notifications found.</p>
         @else
-            <ul class="list-group">
-                @foreach ($notifications as $notification)
-                    <li class="list-group-item notification-item {{ $notification->read_at ? '' : 'bg-light' }}" data-id="{{ $notification->id }}">
-                        {{ $notification->data['message'] }}
-                        @if (!empty($notification->data['asset_history']))
-                            <ul>
-                                @foreach ($notification->data['asset_history'] as $asset_history)
-                                    <li>{{ $asset_history['description'] }} at {{ $asset_history['created_at'] }}</li>
-                                @endforeach
-                            </ul>
-                        @endif
-                        <small class="text-muted">{{ $notification->created_at->diffForHumans() }}</small>
+        <ul class="list-group">
+    @foreach ($notifications as $notification)
+        <li class="list-group-item notification-item {{ $notification->read_at ? '' : 'bg-light' }}" data-id="{{ $notification->id }}">
+            @if (!empty($notification->data['asset_name']))
+                <strong>{{ $notification->data['asset_name'] }}</strong> - 
+            @endif
+            {{ $notification->data['message'] }}
 
-                        <!-- Dropdown Menu -->
-                        <div class="dropdown float-end">
-                            <!-- <button class="btn btn-secondary dropdown-toggle btn-sm" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                                Actions
-                            </button> -->
-                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                @if (!empty($notification->data['asset_id']))
-                                    <li>
-                                        <a class="dropdown-item" href="{{ route('assets.show', $notification->data['asset_id']) }}">View</a>
-                                    </li>
-                                @endif
-                                <li>
-                                    <form action="{{ route('notifications.destroy', $notification->id) }}" method="POST" class="d-inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="dropdown-item text-danger">Delete</button>
-                                    </form>
-                                </li>
-                            </ul>
-                        </div>
-                    </li>
-                @endforeach
-            </ul>
+            @if (!empty($notification->data['asset_history']))
+                <ul>
+                    @foreach ($notification->data['asset_history'] as $asset_history)
+                        <li>{{ $asset_history['description'] }} at {{ $asset_history['created_at'] }}</li>
+                    @endforeach
+                </ul>
+            @endif
+            <small class="text-muted">{{ $notification->created_at->diffForHumans() }}</small>
+
+            <!-- View Button -->
+            @if (!empty($notification->data['asset_id']))
+                <a href="{{ route('assets.show', $notification->data['asset_id']) }}" class="btn btn-primary btn-sm float-end">View</a>
+            @endif
+        </li>
+    @endforeach
+</ul>
         @endif
     </div>
     <br><br><br><br>

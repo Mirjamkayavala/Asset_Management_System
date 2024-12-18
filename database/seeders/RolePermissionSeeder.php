@@ -68,6 +68,10 @@ class RolePermissionSeeder extends Seeder
                         'view-setting',
                         'update-setting',
                         'view-user',
+                        'view-facility',
+                        'create-facility',
+                        'delete-facility',
+                        'update-facility',
                         'update-user',
                         'create-user',
                         'edit-user',
@@ -85,6 +89,7 @@ class RolePermissionSeeder extends Seeder
                         'view-assetHistory',
                         'access-assetHistory',
                         'delete-assetHistory',
+                        'restore-asset',
                     ],
 
             'technician' => ['create-asset',
@@ -96,9 +101,12 @@ class RolePermissionSeeder extends Seeder
                              'view-location',
                              'create-location',
                              'edit-location',
+                             'edit-facility',
+                             'view-facility',
                              'update-location',
                              'access-location',
                              'view-region',
+                             'create-facility',
                              'edit-region',
                              'create-region',
                              'update-region',
@@ -133,9 +141,12 @@ class RolePermissionSeeder extends Seeder
                              'access-assetHistory',
                              'access-report',
                              'access-department',
+                             
+                            'restore-asset',
+                             
                             ],
 
-            'viewer' => ['view-dashboard'],
+            // 'viewer' => ['view-dashboard'],
 
             'costing_department' => ['view-dashboard',
                                      'view-report',
@@ -144,7 +155,7 @@ class RolePermissionSeeder extends Seeder
                                      'access-report',
                                      'restore-asset',
                                      'view-asset',
-                                     'create-asset',
+                                    //  'create-asset',
                                      'access-asset',
                                      'edit-asset',
                                      'delete-asset',
@@ -164,7 +175,7 @@ class RolePermissionSeeder extends Seeder
                             //    'create-invoice',
                             //    'edit-invoice',
                             //    'access-invoice',
-                               'view-assetHistory',
+                            //    'view-assetHistory',
                                
                             ],
         ];

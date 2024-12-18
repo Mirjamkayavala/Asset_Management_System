@@ -42,7 +42,7 @@
                     <tr>
                         <th>ID</th>
                         <th>Name</th>
-                        <th>Contact Information</th>
+                        <!-- <th>Contact Information</th> -->
                         <th>Region</th>
                         <th>Actions</th>
                     </tr>
@@ -52,7 +52,7 @@
                         <tr>
                             <td>{{ $location->id }}</td>
                             <td>{{ $location->location_name }}</td>
-                            <td>{{ $location->contact_information }}</td>
+                            <!-- <td>{{ $location->contact_information }}</td> -->
                             <td>{{ $location->region->region_name }}</td>
                             <td>
                                 <button type="button" class="btn btn-primary btn-sm btn-edit" 
@@ -106,7 +106,7 @@
                         </div>
                         <div class="mb-3">
                             <label for="contact_information" class="form-label">Contact Information</label>
-                            <input type="text" class="form-control @error('contact_information') is-invalid @enderror" id="contact_information" name="contact_information" value="{{ old('contact_information') }}" required>
+                            <input type="text" class="form-control @error('contact_information') is-invalid @enderror" id="contact_information" name="contact_information" value="{{ old('contact_information') }}">
                             @error('contact_information')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror

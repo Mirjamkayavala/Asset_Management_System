@@ -23,7 +23,7 @@ class UpdateAssetCategoryRequest extends FormRequest
     {
         return [
             'category_name' => 'required|string|max:255',
-            'category_code' => 'required|string|max:50',
+            'category_code' => 'nullable|string|max:50',
         ];
     }
 }

@@ -32,6 +32,9 @@ class NotificationController extends Controller
 
         $user->notify(new AssetCreated($assets));
         Auth::user()->notify(new AssetCreated($assets));
+        
+        $user->notify(new AssetUpdated($assets));
+        Auth::user()->notify(new AssetUpdated($assets));
 
         // return view('notifications.index', compact('notifications'));
         return view('notifications.index', compact('notifications'));

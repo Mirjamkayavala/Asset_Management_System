@@ -17,6 +17,8 @@ class Insurance extends Model
         'amount',
         'status',
         'user_id',
+        'last_user_id',
+        'written_off_source',
         'approval_date',
         'rejection_date',
         'claim_date',
@@ -47,5 +49,10 @@ class Insurance extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function lastUser()
+    {
+        return $this->belongsTo(User::class, 'last_user_id');
     }
 }

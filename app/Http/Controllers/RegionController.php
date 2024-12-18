@@ -35,10 +35,24 @@ class RegionController extends Controller
         $this->authorize('create', Region::class);
         $validatedData = $request->validated();
 
-        Region::create($validatedData);
+        try {
+            Region::create($validatedData);
 
-        return redirect()->route('regions.index')
-                        ->with('success', 'Region created successfully.');
+            return redirect()->route('regions.index')
+                            ->with('success', 'Region created successfully.');
+        } catch (QueryException $e) {
+            // Check if the error is due to a duplicate entry
+            if ($e->getCode() === '23000') { 
+                Log::error('Duplicate entry error: ' . $e->getMessage());
+                return redirect()->route('regions.index')
+                                ->with('warning', 'Data already exists, please try again.');
+            }
+
+            // Log any other database error and display a generic error message
+            Log::error('Database error: ' . $e->getMessage());
+            return redirect()->route('regions.index')
+                            ->with('error', 'An error occurred while saving the data. Please try again.');
+        }
     }
 
     /**

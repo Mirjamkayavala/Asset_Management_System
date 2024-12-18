@@ -62,6 +62,7 @@
                     <i class="bx bx-chevron-right arrow-left"></i>
                 </div>
                 <ul class="menu_items submenu">
+
                     @can('access', App\Models\Department::class)
                     <li>
                         <a href="{{ route('departments.index') }}" class="nav_link sublink {{ Request::routeIs('departments.index') ? 'active' : '' }}">
@@ -70,6 +71,14 @@
                         </a>
                     </li>
                     @endcan
+                    <!-- @can('access', App\Models\Department::class) -->
+                    <li>
+                        <a href="{{ route('facilities.index') }}" class="nav_link sublink {{ Request::routeIs('facilities.index') ? 'active' : '' }}">
+                            <span class="navlink_icon"><i class="bx bx-building"></i></span> <!-- Department icon -->
+                            Facility Space
+                        </a>
+                    </li>
+                    <!-- @endcan -->
                     @can('access', App\Models\Region::class)
                     <li>
                         <a href="{{ route('regions.index') }}" class="nav_link sublink {{ Request::routeIs('regions.index') ? 'active' : '' }}">
@@ -78,12 +87,12 @@
                         </a>
                     </li>
                     @endcan
-                    <!-- <li>
+                    <li>
                         <a href="{{ route('audit-trails.index') }}" class="nav_link sublink {{ Request::routeIs('audit-trails.index') ? 'active' : '' }}">
                             <span class="navlink_icon"><i class="bx bx-world"></i></span> 
                             View Audit Trails
                         </a>
-                    </li> -->
+                    </li>
               
                     @can('access', App\Models\Location::class)
                     <li>

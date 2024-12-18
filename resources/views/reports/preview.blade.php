@@ -39,9 +39,9 @@
 
         <div class="report-actions print-hide">
             <a href="{{ route('reports.index') }}" class="btn btn-primary mr-2">Back</a>
-            <a href="/reports/export/pdf" class="btn btn-primary">PDF</a>
-            <a href="/reports/export/excel" class="btn btn-success">Excel</a>
-            <a href="/reports/export/word" class="btn btn-info">Word</a>
+            <a href="{{route('reports.export','pdf'). '?' . http_build_query(request()->query())}}" class="btn btn-primary">PDF</a>
+            <a href="{{route('reports.export','excel'). '?' . http_build_query(request()->query())}}" class="btn btn-success">Excel</a>
+            <a href="{{route('reports.export','word'). '?' . http_build_query(request()->query())}}" class="btn btn-info">Word</a>
             <button id="printButton" class="btn btn-secondary">Print</button>
         </div>
 
@@ -54,9 +54,9 @@
                     <th>Serial Number</th>
                     <th>Asset No</th>
                     <th>Category</th>
-                    <th>Current User</th>
+                    <th>Assign To</th>
                     <th>Date</th>
-                    <th>Previous User</th>
+                    <!-- <th>Previous User</th> -->
                     <th>Vendor</th>
                     <th>Status</th>
                 </tr>
@@ -68,16 +68,20 @@
                         <td>{{ $asset->model }}</td>
                         <td>{{ $asset->serial_number }}</td>
                         <td>{{ $asset->asset_number }}</td>
-                        <td>{{ $asset->category }}</td>
-                        <td>{{ $asset->users ? $asset->users->name : 'N/A' }}</td>
-                        <td>{{ $asset->date }}</td>
-                        <td>{{ $asset->users ? optional($asset->previousUser)->name : 'N/A' }}</td>
+                        <td>{{ $asset->assetCategory->category_name ?? 'N/A' }}</td>
+                        <td>{{ $asset->user->name ?? 'N/A' }}</td>
+                        <!-- <td>{{ \Carbon\Carbon::parse($asset->date)->format('Y-m-d H:i:s') }}</td> -->
+                        <td>{{ \Carbon\Carbon::parse($asset->created_at)->format('Y-m-d H:i:s') }}</td>
+                        <!-- <td>{{ optional($asset->previousUser)->name ?? 'N/A' }}</td> -->
                         <td>{{ $asset->vendor }}</td>
                         <td>{{ $asset->status }}</td>
                     </tr>
                 @endforeach
             </tbody>
         </table>
+        <div class="d-flex justify-content-end">
+            {{ $assets->appends(request()->query())->links() }}
+        </div>
     </div>
 
     <script>
@@ -102,4 +106,5 @@
             document.querySelector('.container').classList.remove('print-adjust');
         });
     </script>
+    <br><br><br><br>
 </x-app-layout>
